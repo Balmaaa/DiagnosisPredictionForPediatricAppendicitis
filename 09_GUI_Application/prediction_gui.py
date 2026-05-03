@@ -117,18 +117,21 @@ ZERO_MEANS_MISSING = {'WBC_Count', 'RBC_Count', 'Hemoglobin', 'RDW',
 
 
 class PredictionGUI:
-    def __init__(self, root):
+    def __init__(self, root, show_landing=True):
         self.root = root
         self.root.title("Pediatric Appendicitis Prediction System")
-        self.root.geometry("2000x900")
-        self.models = {}
-        self.metadata = {}
-        self.transformer_info = {}
-        self.available_models = []
-        self.load_models()
-        self.create_widgets()
+        self.root.geometry("900x600")
+        self.root.configure(bg='white')
+        
+        if show_landing:
+            self.show_landing_page()
+        else:
+            self.load_models()
+            self._initialize_variables()
+            self.show_main_gui()
 
     def load_models(self):
+        self.models = {}  # Initialize models dictionary
         model_dir = Path(__file__).parent / 'saved_models'
         if not model_dir.exists():
             print(f"Model directory not found: {model_dir}"); return
@@ -179,6 +182,181 @@ class PredictionGUI:
 
         self.available_models = list(self.models.keys())
         print(f"Available models: {self.available_models}")
+
+    def show_landing_page(self):
+        """Display the landing page with system overview"""
+        # Clear any existing widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Create landing page content
+        self.create_landing_header()
+        self.create_landing_description()
+        self.create_landing_start_button()
+        self.create_landing_footer()
+    
+    def create_landing_header(self):
+        """Create the header section with title"""
+        title_frame = ttk.Frame(self.root, padding="30")
+        title_frame.pack(fill=tk.X)
+        
+        # Main title
+        title_label = ttk.Label(
+            title_frame,
+            text="Pediatric Appendicitis Prediction System",
+            font=('Arial', 28, 'bold')
+        )
+        title_label.pack(pady=(0, 10))
+        
+        # Subtitle
+        subtitle_label = ttk.Label(
+            title_frame,
+            text="Clinical Decision Support Tool",
+            font=('Arial', 14, 'italic')
+        )
+        subtitle_label.pack()
+    
+    def create_landing_description(self):
+        """Create the system description section"""
+        desc_frame = ttk.LabelFrame(self.root, text="SYSTEM OVERVIEW", padding="20")
+        desc_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        
+        # Main description
+        main_desc = ttk.Label(
+            desc_frame,
+            text=(
+                "This AI-powered system provides real-time predictions for pediatric appendicitis "
+                "using multiple advanced machine learning models. Designed to assist healthcare "
+                "professionals in making informed clinical decisions."
+            ),
+            font=('Arial', 12),
+            wraplength=800,
+            justify=tk.LEFT
+        )
+        main_desc.pack(pady=(0, 20))
+        
+        # Key features section
+        features_frame = ttk.LabelFrame(desc_frame, text="KEY FEATURES", padding="15")
+        features_frame.pack(fill=tk.X, pady=10)
+        
+        features_text = ttk.Label(
+            features_frame,
+            text=(
+                "• Multiple AI Models: Decision Tree, Gradient Boosting, XGBoost, and Transformer\n"
+                "• Real-time Predictions with Confidence Scores\n"
+                "• Support for Laboratory Results and Clinical Examination Data\n"
+                "• High Accuracy: XGBoost model achieves 85.3% accuracy\n"
+                "• Medical Safety Focus: High Sensitivity for Critical Cases\n"
+                "• User-Friendly Interface Designed for Healthcare Professionals"
+            ),
+            font=('Arial', 11),
+            wraplength=750,
+            justify=tk.LEFT
+        )
+        features_text.pack()
+        
+        # Technical specifications
+        tech_frame = ttk.LabelFrame(desc_frame, text="TECHNICAL SPECIFICATIONS", padding="15")
+        tech_frame.pack(fill=tk.X, pady=10)
+        
+        tech_text = ttk.Label(
+            tech_frame,
+            text=(
+                "• Input Features: 30 clinical and laboratory parameters\n"
+                "• Processing Time: < 1 second per prediction\n"
+                "• Model Validation: Cross-validated on pediatric patient datasets\n"
+                "• Output: Diagnosis prediction with probability scores"
+            ),
+            font=('Arial', 11),
+            wraplength=750,
+            justify=tk.LEFT
+        )
+        tech_text.pack()
+    
+    def create_landing_start_button(self):
+        """Create the start button section"""
+        button_frame = ttk.Frame(self.root, padding="20")
+        button_frame.pack(fill=tk.X)
+        
+        # Start button
+        start_button = ttk.Button(
+            button_frame,
+            text="START SYSTEM",
+            command=self.start_main_system,
+            style='Accent.TButton'
+        )
+        start_button.pack(pady=10)
+        
+        # Configure button style for emphasis
+        style = ttk.Style()
+        style.configure(
+            'Accent.TButton',
+            font=('Arial', 16, 'bold'),
+            padding=(20, 10)
+        )
+        
+        # Instructions
+        instruction_label = ttk.Label(
+            button_frame,
+            text="Click 'START SYSTEM' to begin using the prediction tool",
+            font=('Arial', 10, 'italic'),
+            foreground='gray'
+        )
+        instruction_label.pack(pady=(5, 0))
+    
+    def create_landing_footer(self):
+        """Create the footer section"""
+        footer_frame = ttk.Frame(self.root, padding="15")
+        footer_frame.pack(fill=tk.X, side=tk.BOTTOM)
+        
+        footer_text = ttk.Label(
+            footer_frame,
+            text="Version 1.0 | Developed for Medical Research Purposes | "
+                 "© 2026 Pediatric Appendicitis Prediction System",
+            font=('Arial', 9),
+            foreground='gray'
+        )
+        footer_text.pack()
+        
+        disclaimer_label = ttk.Label(
+            footer_frame,
+            text="This system is intended for research and educational purposes only. "
+                 "Always consult with qualified healthcare professionals for medical decisions.",
+            font=('Arial', 8),
+            foreground='darkgray',
+            wraplength=800
+        )
+        disclaimer_label.pack(pady=(5, 0))
+    
+    def start_main_system(self):
+        """Transition from landing page to main GUI"""
+        # Load models and initialize variables
+        self.load_models()
+        self._initialize_variables()
+        
+        # Show main GUI
+        self.show_main_gui()
+    
+    def show_main_gui(self):
+        """Display the main prediction GUI"""
+        # Clear landing page widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Resize window for main GUI
+        self.root.geometry("1200x800")
+        
+        # Create main GUI widgets
+        self.create_widgets()
+    
+    def _initialize_variables(self):
+        """Initialize GUI variables"""
+        self.model_var = tk.StringVar()
+        self.status_var = tk.StringVar()
+        self.status_var.set("Ready")
+        
+        # Initialize input variables dictionary
+        self.input_vars = {}
 
     def preprocess_input(self, input_data):
         fv = {}
@@ -321,7 +499,7 @@ class PredictionGUI:
         ttk.Label(title_frame, text="Clinical Decision Support Tool",
                   font=('Arial', 12, 'italic')).pack()
 
-        model_frame = ttk.LabelFrame(self.root, text="Model Selection", padding="10")
+        model_frame = ttk.LabelFrame(self.root, text="MODEL SELECTION", padding="10")
         model_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=10, pady=5)
         ttk.Label(model_frame, text="Select Model:", font=('Arial', 11, 'bold')).pack(side=tk.LEFT, padx=5)
         self.model_var = tk.StringVar()
