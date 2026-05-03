@@ -192,9 +192,11 @@ class PredictionGUI:
                 try: fv[feat] = float(val)
                 except: fv[feat] = 0.0
             elif feat in LAB_FIELDS:
-                # Lab feature is not available - use neutral defaults (not medical defaults)
-                # This prevents artificial signals while maintaining model compatibility
-                fv[feat] = CLINICAL_DEFAULTS.get(feat, 0.0)  # Neutral value that won't affect prediction
+                if feat in available_labs:
+                    fv[feat] = float(input_data.get(feat, 0.0))
+                else:
+                    # DO NOT inject fake signal
+                    fv[feat] = CLINICAL_DEFAULTS.get(feat, 0.0)
             else:
                 # Non-lab feature - use the value or default
                 val = input_data.get(feat)
