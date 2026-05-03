@@ -194,7 +194,7 @@ class PredictionGUI:
             elif feat in LAB_FIELDS:
                 # Lab feature is not available - use neutral defaults (not medical defaults)
                 # This prevents artificial signals while maintaining model compatibility
-                fv[feat] = 0.0  # Neutral value that won't affect prediction
+                fv[feat] = CLINICAL_DEFAULTS.get(feat, 0.0)  # Neutral value that won't affect prediction
             else:
                 # Non-lab feature - use the value or default
                 val = input_data.get(feat)
@@ -225,9 +225,19 @@ class PredictionGUI:
     def predict(self, model_name, features_array):
         if model_name not in self.models:
             raise ValueError(f"Model '{model_name}' not available")
+        
         if model_name == 'Transformer':
+            # Transformer uses all 38 features (30 base + 8 missing indicators)
             return self._predict_transformer(features_array)
-        return self._predict_sklearn(model_name, features_array)
+        else:
+            # sklearn models (Decision Tree, Gradient Boosting, XGBoost) 
+            # were trained with ONLY 30 features - slice to first 30
+            if isinstance(features_array, np.ndarray):
+                sklearn_features = features_array[:, :30]  # Take only first 30 features
+            else:
+                # Handle list or other input types
+                sklearn_features = np.array(features_array)[:, :30]
+            return self._predict_sklearn(model_name, sklearn_features)
 
     def _predict_sklearn(self, model_name, features_array):
         model = self.models[model_name]
@@ -235,13 +245,21 @@ class PredictionGUI:
         scaler = self.metadata.get('numerical_scalers')
         if scaler is not None and hasattr(scaler, 'mean_'):
             try:
-                # Extract numerical features in the order the scaler expects (NUMERICAL_FEATURES)
-                feat_to_idx = {f: i for i, f in enumerate(ALL_FEATURES)}
-                scaler_order_idx = [feat_to_idx[f] for f in NUMERICAL_FEATURES if f in feat_to_idx]
-                if scaler_order_idx:
-                    num_block = processed[:, scaler_order_idx]
+                # For sklearn models, use 30-feature scaling
+                # Create feature to index mapping for ALL_30_FEATURES
+                feat_to_idx = {f: i for i, f in enumerate(ALL_30_FEATURES)}
+                
+                # Find numerical features within the 30 features
+                numerical_indices = []
+                for num_feat in NUMERICAL_FEATURES:
+                    if num_feat in feat_to_idx and feat_to_idx[num_feat] < 30:
+                        numerical_indices.append(feat_to_idx[num_feat])
+                
+                if numerical_indices:
+                    # Extract and scale numerical features
+                    num_block = processed[:, numerical_indices]
                     scaled_block = scaler.transform(num_block)
-                    processed[:, scaler_order_idx] = scaled_block
+                    processed[:, numerical_indices] = scaled_block
             except: pass
         pred = model.predict(processed)[0]
         if hasattr(model, 'predict_proba'):

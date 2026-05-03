@@ -1,0 +1,55 @@
+====================================================================================================
+COMPREHENSIVE MODEL COMPARISON REPORT
+Pediatric Appendicitis Prediction System
+====================================================================================================
+Generated on: 2026-05-03 21:36:08
+
+EXECUTIVE SUMMARY:
+--------------------------------------------------
+Best Overall Model: XGBoost (CSV)
+Best Accuracy: 0.8530
+
+DATASET: CSV
+------------------------------
+Transformer:
+  Accuracy: 0.7700
+  Sensitivity: 0.7720
+  Specificity: 0.7143
+  PPV: 0.9868
+  NPV: 0.1020
+
+Decision Tree:
+  Accuracy: 0.8300
+  Sensitivity: 0.8446
+  Specificity: 0.4286
+  PPV: 0.9760
+  NPV: 0.0909
+
+Gradient Boosting:
+  Accuracy: 0.8498
+  Sensitivity: 0.6975
+  Specificity: 0.9433
+  PPV: 0.8830
+  NPV: 0.8356
+
+XGBoost:
+  Accuracy: 0.8530
+  Sensitivity: 0.6891
+  Specificity: 0.9536
+  PPV: 0.9011
+  NPV: 0.8333
+
+MEDICAL INTERPRETATION:
+--------------------------------------------------
+• Sensitivity (True Positive Rate): Ability to correctly identify appendicitis cases
+• Specificity (True Negative Rate): Ability to correctly identify non-appendicitis cases
+• PPV (Positive Predictive Value): Probability that positive prediction is correct
+• NPV (Negative Predictive Value): Probability that negative prediction is correct
+
+RECOMMENDATIONS:
+--------------------------------------------------
+• For screening (high sensitivity needed): Decision Tree (0.8446)
+• For confirmation (high specificity needed): XGBoost (0.9536)
+• Consider ensemble approach for balanced performance
+
+====================================================================================================
