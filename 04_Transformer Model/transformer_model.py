@@ -486,7 +486,7 @@ def main():
             
         print(f"\nResults saved to: {results_file}")
             
-        gui_checkpoint_path = Path(__file__).parent.parent / '09_GUI_Application' / 'saved_models' / 'Transformer.pt'
+        gui_checkpoint_path = Path(__file__).parent.parent / '09_GUI Application' / 'saved_models' / 'Transformer.pt'
         gui_checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
         scaler = pipeline["scaler"]
