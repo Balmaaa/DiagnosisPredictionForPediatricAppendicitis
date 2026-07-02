@@ -1,0 +1,111 @@
+============================================================
+TARGET & LEAKAGE CONTROL ANALYSIS
+============================================================
+Analyzing Integrated Dataset
+============================================================
+[OK] Successfully loaded integrated dataset:
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\00_Dataset Integration\merged_dataset.csv
+
+============================================================
+DIAGNOSIS COLUMN ANALYSIS - Integrated Dataset
+============================================================
+Potential diagnosis columns found : 3
+
+Column : Diagnosis_Presumptive
+Unique Values : 16
+Missing Values : 782 (50.06%)
+
+Value Distribution
+NaN                         782 (50.06%)
+appendicitis                682 (43.66%)
+no appendicitis              78 (4.99%)
+chronische Appendizitis       4 (0.26%)
+Gastroenteritis               3 (0.19%)
+chronische Bauchschmerzen     2 (0.13%)
+Appendizitis/ Lymphadenitis mesenterialis     1 (0.06%)
+Ovarialtorsion                1 (0.06%)
+prolongierte Gastroenteritis     1 (0.06%)
+Appendizitis, Lymphadenitis mesenterialis     1 (0.06%)
+... 7 more values
+
+Column : Diagnosis
+Unique Values : 2
+Missing Values : 3 (0.19%)
+
+Value Distribution
+appendicitis                926 (59.28%)
+no appendicitis             633 (40.52%)
+NaN                           3 (0.19%)
+
+Column : Gynecological_Findings
+Unique Values : 13
+Missing Values : 1510 (96.67%)
+
+Value Distribution
+NaN                        1510 (96.67%)
+keine                        18 (1.15%)
+Ovarialzyste                 10 (0.64%)
+Ovarialzysten                 4 (0.26%)
+Zyste Uterus                  2 (0.13%)
+In beiden Ovarien Zysten darstellbar, links Ovar mit regelrechter Perfusion, rechts etwas vergrößert, keine eindeutige Perfusion nachweisbar. Retrovesikal freie Flüssigkeit mit Binnenecho     2 (0.13%)
+Ausschluss pathologischer Ovarialbefund     2 (0.13%)
+kleine Ovarzyste rechts       2 (0.13%)
+kein Anhalt für eine gynäkologische Ursache der Beschwerden     2 (0.13%)
+V. a. Ovarialtorsion          2 (0.13%)
+... 4 more values
+
+============================================================
+EXCLUDING PRESUMPTIVE DIAGNOSIS - Integrated Dataset
+============================================================
+EXCLUDED : Diagnosis_Presumptive
+
+Excluded : 1
+Remaining : 2
+
+============================================================
+EXCLUDING OUTCOME-DERIVED VARIABLES - Integrated Dataset
+============================================================
+
+Excluded : 0
+Remaining : 2
+
+============================================================
+EXCLUDING SCORING SYSTEMS - Integrated Dataset
+============================================================
+
+Excluded : 0
+Remaining : 2
+
+============================================================
+EXCLUDING SPECIALTY COLUMNS - Integrated Dataset
+============================================================
+EXCLUDED : Gynecological_Findings (Specialty-specific variable)
+
+Excluded : 1
+Remaining : 1
+
+============================================================
+TARGET VALIDATION - Integrated Dataset
+============================================================
+SUCCESS : Final Target Column -> Diagnosis
+
+============================================================
+FINAL TARGET SUMMARY
+============================================================
+Final Target Column : Diagnosis
+Target Leakage Status : PASSED
+
+The following columns were successfully excluded from being considered as prediction targets:
+• Presumptive diagnosis variables
+• Outcome-derived variables
+• Clinical scoring systems
+• Specialty-specific diagnosis variables
+
+Selected Machine Learning Target
+    Diagnosis
+
+Remaining dataset columns will be treated as candidate predictor variables during preprocessing.
+
+============================================================
+TARGET & LEAKAGE CONTROL COMPLETED
+============================================================

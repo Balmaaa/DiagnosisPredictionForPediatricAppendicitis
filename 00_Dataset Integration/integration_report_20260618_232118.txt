@@ -1,0 +1,138 @@
+============================================================
+DATASET INTEGRATION
+============================================================
+
+Loading datasets...
+[OK] Dataset 1 loaded : C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\Dataset 1\app_data.csv
+[OK] Dataset 2 loaded : C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\Dataset 2\Regensburg Pediatric Appendicitis.csv
+Dataset 1 Shape : (782, 58)
+Dataset 2 Shape : (782, 58)
+
+============================================================
+SCHEMA VALIDATION
+============================================================
+Dataset 1 Columns : 58
+Dataset 2 Columns : 57
+[WARNING] Column count mismatch detected.
+
+Columns missing from Dataset 2:
+   Diagnosis_Presumptive
+[WARNING] Column order differs.
+Aligning Dataset 2 to Dataset 1 schema.
+[OK] Schemas successfully aligned.
+
+Added missing columns to Dataset 2:
+   Diagnosis_Presumptive
+[OK] Datatypes match.
+
+Schema validation completed.
+
+============================================================
+EXACT DUPLICATE ANALYSIS
+============================================================
+Exact duplicate patients : 2
+Duplicate percentage : 0.26%
+
+============================================================
+NEAR DUPLICATE ANALYSIS
+============================================================
+Potential duplicate patients : 782
+
+============================================================
+INTEGRATION SUMMARY
+============================================================
+Dataset 1 Patients : 782
+Dataset 2 Patients : 782
+Exact Duplicates : 2
+Unique Dataset 1 : 780
+Unique Dataset 2 : 780
+Projected Merged Size : 1562
+
+============================================================
+DATASET MERGING
+============================================================
+Rows before duplicate removal : 1564
+Duplicate rows removed : 2
+Final merged dataset : 1562 patients
+
+============================================================
+FINAL DATASET PREPARATION
+============================================================
+Patient IDs generated : 1562
+Dataset organization completed.
+
+============================================================
+FINAL DATA QUALITY
+============================================================
+Rows : 1562
+Columns : 60
+Duplicate Rows : 0
+Columns with Missing Values : 58
+
+Missing Value Summary
+Age                                     1 (0.06%)
+BMI                                    53 (3.39%)
+Sex                                     3 (0.19%)
+Height                                 51 (3.27%)
+Weight                                  5 (0.32%)
+Length_of_Stay                          7 (0.45%)
+Management                              1 (0.06%)
+Severity                                1 (0.06%)
+Diagnosis_Presumptive                 782 (50.06%)
+Diagnosis                               3 (0.19%)
+Alvarado_Score                        103 (6.59%)
+Paedriatic_Appendicitis_Score         103 (6.59%)
+Appendix_on_US                          9 (0.58%)
+Appendix_Diameter                     567 (36.30%)
+Migratory_Pain                         17 (1.09%)
+Lower_Right_Abd_Pain                   15 (0.96%)
+Contralateral_Rebound_Tenderness       29 (1.86%)
+Coughing_Pain                          31 (1.98%)
+Nausea                                 15 (0.96%)
+Loss_of_Appetite                       19 (1.22%)
+Body_Temperature                       13 (0.83%)
+WBC_Count                              11 (0.70%)
+Neutrophil_Percentage                 205 (13.12%)
+Segmented_Neutrophils                1454 (93.09%)
+Neutrophilia                           99 (6.34%)
+RBC_Count                              35 (2.24%)
+Hemoglobin                             35 (2.24%)
+RDW                                    51 (3.27%)
+Thrombocyte_Count                      35 (2.24%)
+Ketones_in_Urine                      398 (25.48%)
+RBC_in_Urine                          410 (26.25%)
+WBC_in_Urine                          396 (25.35%)
+CRP                                    21 (1.34%)
+Dysuria                                57 (3.65%)
+Stool                                  33 (2.11%)
+Peritonitis                            17 (1.09%)
+Psoas_Sign                             72 (4.61%)
+Ipsilateral_Rebound_Tenderness        325 (20.81%)
+US_Performed                            7 (0.45%)
+US_Number                              43 (2.75%)
+Free_Fluids                           125 (8.00%)
+Appendix_Wall_Layers                 1126 (72.09%)
+Target_Sign                          1286 (82.33%)
+Appendicolith                        1424 (91.17%)
+Perfusion                            1436 (91.93%)
+Perforation                          1400 (89.63%)
+Surrounding_Tissue_Reaction          1059 (67.80%)
+Appendicular_Abscess                 1392 (89.12%)
+Abscess_Location                     1536 (98.34%)
+Pathological_Lymph_Nodes             1157 (74.07%)
+Lymph_Nodes_Location                 1321 (84.57%)
+Bowel_Wall_Thickening                1364 (87.32%)
+Conglomerate_of_Bowel_Loops          1476 (94.49%)
+Ileus                                1442 (92.32%)
+Coprostasis                          1420 (90.91%)
+Meteorism                            1282 (82.07%)
+Enteritis                            1431 (91.61%)
+Gynecological_Findings               1510 (96.67%)
+
+============================================================
+SAVING OUTPUT FILES
+============================================================
+Saved : merged_dataset.csv
+All integration files saved successfully.
+
+Dataset integration completed successfully.

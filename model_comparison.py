@@ -56,6 +56,14 @@ class ModelComparison:
             if 'final_metrics' in results:
                 metrics = results['final_metrics']
                 
+                # Calculate F1 Score
+                precision = metrics.get('precision', 0)
+                recall = metrics.get('sensitivity', 0)
+                if precision + recall > 0:
+                    f1_score = 2 * (precision * recall) / (precision + recall)
+                else:
+                    f1_score = 0
+                
                 comparison_data.append({
                     'Model': model_name,
                     'Dataset': results.get('dataset_name', 'Unknown'),
@@ -63,6 +71,7 @@ class ModelComparison:
                     'Precision': metrics.get('precision', 0),
                     'Sensitivity': metrics.get('sensitivity', 0),
                     'Specificity': metrics.get('specificity', 0),
+                    'F1 Score': f1_score,
                     'PPV': metrics.get('ppv', 0),
                     'NPV': metrics.get('npv', 0),
                     'True Positives': metrics.get('tp', 0),
@@ -93,11 +102,19 @@ class ModelComparison:
             dataset_df = self.comparison_df[self.comparison_df['Dataset'] == dataset]
             
             # Format the table
-            print(f"{'Model':<20} {'Accuracy':<10} {'Precision':<10} {'Sensitivity':<12} {'Specificity':<12}")
-            print("-" * 70)
+            print(f"{'Model':<20} {'Accuracy':<10} {'Precision':<10} {'Sensitivity':<12} {'Specificity':<12} {'F1 Score':<10}")
+            print("-" * 80)
             
             for _, row in dataset_df.iterrows():
-                print(f"{row['Model']:<20} {row['Accuracy']:<10.4f} {row['Precision']:<10.4f} {row['Sensitivity']:<12.4f} {row['Specificity']:<12.4f}")
+                print(f"{row['Model']:<20} {row['Accuracy']:<10.4f} {row['Precision']:<10.4f} {row['Sensitivity']:<12.4f} {row['Specificity']:<12.4f} {row['F1 Score']:<10.4f}")
+                
+                # Add confusion matrix for each model
+                print(f"\n{row['Model']} Confusion Matrix:")
+                print("Predicted")
+                print("        Yes    No")
+                print(f"Actual Yes     {row['True Positives']:<6} {row['False Negatives']:<6}")
+                print(f"       No      {row['False Positives']:<6} {row['True Negatives']:<6}")
+                print("-" * 40)
             
             # Find best model for each metric
             best_accuracy = dataset_df.loc[dataset_df['Accuracy'].idxmax()]
@@ -116,13 +133,13 @@ class ModelComparison:
             self.create_comparison_table()
         
         # Create subplots for different metrics
-        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        fig, axes = plt.subplots(2, 3, figsize=(18, 12))
         fig.suptitle('Model Performance Comparison', fontsize=16, fontweight='bold')
         
-        metrics = ['Accuracy', 'Precision', 'Sensitivity', 'Specificity']
-        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D']
+        metrics = ['Accuracy', 'Precision', 'Sensitivity', 'Specificity', 'F1 Score']
+        colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#8B5CF6']
         
-        for idx, (metric, ax) in enumerate(zip(metrics, axes.flatten())):
+        for idx, (metric, ax) in enumerate(zip(metrics, axes.flatten()[:5])):
             # Group by dataset
             for dataset_idx, dataset in enumerate(self.comparison_df['Dataset'].unique()):
                 dataset_df = self.comparison_df[self.comparison_df['Dataset'] == dataset]
@@ -158,6 +175,9 @@ class ModelComparison:
             ax.set_xticklabels(dataset_df['Model'], rotation=45, ha='right')
             ax.legend()
             ax.grid(True, alpha=0.3)
+        
+        # Hide the unused subplot
+        axes.flatten()[5].set_visible(False)
         
         plt.tight_layout()
         
@@ -220,8 +240,10 @@ class ModelComparison:
             for _, row in dataset_df.iterrows():
                 report.append(f"{row['Model']}:")
                 report.append(f"  Accuracy: {row['Accuracy']:.4f}")
+                report.append(f"  Precision: {row['Precision']:.4f}")
                 report.append(f"  Sensitivity: {row['Sensitivity']:.4f}")
                 report.append(f"  Specificity: {row['Specificity']:.4f}")
+                report.append(f"  F1 Score: {row['F1 Score']:.4f}")
                 report.append(f"  PPV: {row['PPV']:.4f}")
                 report.append(f"  NPV: {row['NPV']:.4f}")
                 report.append("")
@@ -231,6 +253,7 @@ class ModelComparison:
         report.append("-" * 50)
         report.append("• Sensitivity (True Positive Rate): Ability to correctly identify appendicitis cases")
         report.append("• Specificity (True Negative Rate): Ability to correctly identify non-appendicitis cases")
+        report.append("• F1 Score: Harmonic mean of precision and sensitivity")
         report.append("• PPV (Positive Predictive Value): Probability that positive prediction is correct")
         report.append("• NPV (Negative Predictive Value): Probability that negative prediction is correct")
         report.append("")

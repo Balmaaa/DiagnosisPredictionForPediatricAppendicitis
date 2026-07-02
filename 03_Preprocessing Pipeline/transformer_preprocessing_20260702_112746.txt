@@ -1,0 +1,30 @@
+======================================================================
+TRANSFORMER PREPROCESSING PIPELINE
+======================================================================
+[OK] Dataset Loaded
+Shape : (1562, 60)
+
+============================================================
+TRANSFORMER PREPROCESSING
+============================================================
+Removing 3 samples with missing target.
+Original Features : 59
+Leakage Columns Removed : 9
+Numerical Features : 43
+Categorical Features : 32
+Train Shape : (997, 75)
+Test Shape : (312, 75)
+Train Shape : (997, 75)
+Validation Shape : (250, 75)
+Test Shape : (312, 75)
+Target successfully encoded.
+Feature Info Built : 75 features
+Pipeline Saved:
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\transformer_pipeline_20260702_112746.pkl
+Total Numerical Features : 43
+Total Categorical Features : 32
+Total Features : 75
+
+======================================================================
+PREPROCESSING FINISHED SUCCESSFULLY
+======================================================================

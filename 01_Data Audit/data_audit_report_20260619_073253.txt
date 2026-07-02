@@ -1,0 +1,301 @@
+============================================================
+DATA AUDIT REPORT
+============================================================
+Analyzing Integrated Dataset
+============================================================
+[OK] Successfully loaded integrated dataset:
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\00_Dataset Integration\merged_dataset.csv
+
+============================================================
+DATASET : Integrated Dataset
+============================================================
+Shape : 1562 rows x 60 columns
+
+Column Names (60 total)
+ 1. Patient_Record_ID
+ 2. Source_Dataset
+ 3. Age
+ 4. BMI
+ 5. Sex
+ 6. Height
+ 7. Weight
+ 8. Length_of_Stay
+ 9. Management
+10. Severity
+11. Diagnosis_Presumptive
+12. Diagnosis
+13. Alvarado_Score
+14. Paedriatic_Appendicitis_Score
+15. Appendix_on_US
+16. Appendix_Diameter
+17. Migratory_Pain
+18. Lower_Right_Abd_Pain
+19. Contralateral_Rebound_Tenderness
+20. Coughing_Pain
+21. Nausea
+22. Loss_of_Appetite
+23. Body_Temperature
+24. WBC_Count
+25. Neutrophil_Percentage
+26. Segmented_Neutrophils
+27. Neutrophilia
+28. RBC_Count
+29. Hemoglobin
+30. RDW
+31. Thrombocyte_Count
+32. Ketones_in_Urine
+33. RBC_in_Urine
+34. WBC_in_Urine
+35. CRP
+36. Dysuria
+37. Stool
+38. Peritonitis
+39. Psoas_Sign
+40. Ipsilateral_Rebound_Tenderness
+41. US_Performed
+42. US_Number
+43. Free_Fluids
+44. Appendix_Wall_Layers
+45. Target_Sign
+46. Appendicolith
+47. Perfusion
+48. Perforation
+49. Surrounding_Tissue_Reaction
+50. Appendicular_Abscess
+51. Abscess_Location
+52. Pathological_Lymph_Nodes
+53. Lymph_Nodes_Location
+54. Bowel_Wall_Thickening
+55. Conglomerate_of_Bowel_Loops
+56. Ileus
+57. Coprostasis
+58. Meteorism
+59. Enteritis
+60. Gynecological_Findings
+
+Data Types
+object : 42 columns
+float64 : 18 columns
+
+Detailed Data Types
+Patient_Record_ID                        object
+Source_Dataset                           object
+Age                                      float64
+BMI                                      float64
+Sex                                      object
+Height                                   float64
+Weight                                   float64
+Length_of_Stay                           float64
+Management                               object
+Severity                                 object
+Diagnosis_Presumptive                    object
+Diagnosis                                object
+Alvarado_Score                           float64
+Paedriatic_Appendicitis_Score            float64
+Appendix_on_US                           object
+Appendix_Diameter                        float64
+Migratory_Pain                           object
+Lower_Right_Abd_Pain                     object
+Contralateral_Rebound_Tenderness         object
+Coughing_Pain                            object
+Nausea                                   object
+Loss_of_Appetite                         object
+Body_Temperature                         float64
+WBC_Count                                float64
+Neutrophil_Percentage                    float64
+Segmented_Neutrophils                    float64
+Neutrophilia                             object
+RBC_Count                                float64
+Hemoglobin                               float64
+RDW                                      float64
+Thrombocyte_Count                        float64
+Ketones_in_Urine                         object
+RBC_in_Urine                             object
+WBC_in_Urine                             object
+CRP                                      float64
+Dysuria                                  object
+Stool                                    object
+Peritonitis                              object
+Psoas_Sign                               object
+Ipsilateral_Rebound_Tenderness           object
+US_Performed                             object
+US_Number                                float64
+Free_Fluids                              object
+Appendix_Wall_Layers                     object
+Target_Sign                              object
+Appendicolith                            object
+Perfusion                                object
+Perforation                              object
+Surrounding_Tissue_Reaction              object
+Appendicular_Abscess                     object
+Abscess_Location                         object
+Pathological_Lymph_Nodes                 object
+Lymph_Nodes_Location                     object
+Bowel_Wall_Thickening                    object
+Conglomerate_of_Bowel_Loops              object
+Ileus                                    object
+Coprostasis                              object
+Meteorism                                object
+Enteritis                                object
+Gynecological_Findings                   object
+
+============================================================
+DATASET INTEGRITY
+============================================================
+Total Patient IDs : 1562
+Duplicate Patient IDs : 0
+[OK] Patient_Record_ID values are unique.
+
+Source Dataset Distribution
+Newer_Cohort         782
+Older_Cohort         780
+
+Duplicate Rows : 0
+Duplicate Records (excluding Patient_Record_ID) : 0
+
+============================================================
+COLUMN NAME NORMALIZATION - Integrated Dataset
+============================================================
+Original Name                            Normalized Name                         
+---------------------------------------- ----------------------------------------
+Patient_Record_ID                        patient_record_id                       
+Source_Dataset                           source_dataset                          
+Age                                      age                                     
+BMI                                      bmi                                     
+Sex                                      sex                                     
+Height                                   height                                  
+Weight                                   weight                                  
+Length_of_Stay                           length_of_stay                          
+Management                               management                              
+Severity                                 severity                                
+Diagnosis_Presumptive                    diagnosis_presumptive                   
+Diagnosis                                diagnosis                               
+Alvarado_Score                           alvarado_score                          
+Paedriatic_Appendicitis_Score            paedriatic_appendicitis_score           
+Appendix_on_US                           appendix_on_us                          
+Appendix_Diameter                        appendix_diameter                       
+Migratory_Pain                           migratory_pain                          
+Lower_Right_Abd_Pain                     lower_right_abd_pain                    
+Contralateral_Rebound_Tenderness         contralateral_rebound_tenderness        
+Coughing_Pain                            coughing_pain                           
+Nausea                                   nausea                                  
+Loss_of_Appetite                         loss_of_appetite                        
+Body_Temperature                         body_temperature                        
+WBC_Count                                wbc_count                               
+Neutrophil_Percentage                    neutrophil_percentage                   
+Segmented_Neutrophils                    segmented_neutrophils                   
+Neutrophilia                             neutrophilia                            
+RBC_Count                                rbc_count                               
+Hemoglobin                               hemoglobin                              
+RDW                                      rdw                                     
+Thrombocyte_Count                        thrombocyte_count                       
+Ketones_in_Urine                         ketones_in_urine                        
+RBC_in_Urine                             rbc_in_urine                            
+WBC_in_Urine                             wbc_in_urine                            
+CRP                                      crp                                     
+Dysuria                                  dysuria                                 
+Stool                                    stool                                   
+Peritonitis                              peritonitis                             
+Psoas_Sign                               psoas_sign                              
+Ipsilateral_Rebound_Tenderness           ipsilateral_rebound_tenderness          
+US_Performed                             us_performed                            
+US_Number                                us_number                               
+Free_Fluids                              free_fluids                             
+Appendix_Wall_Layers                     appendix_wall_layers                    
+Target_Sign                              target_sign                             
+Appendicolith                            appendicolith                           
+Perfusion                                perfusion                               
+Perforation                              perforation                             
+Surrounding_Tissue_Reaction              surrounding_tissue_reaction             
+Appendicular_Abscess                     appendicular_abscess                    
+Abscess_Location                         abscess_location                        
+Pathological_Lymph_Nodes                 pathological_lymph_nodes                
+Lymph_Nodes_Location                     lymph_nodes_location                    
+Bowel_Wall_Thickening                    bowel_wall_thickening                   
+Conglomerate_of_Bowel_Loops              conglomerate_of_bowel_loops             
+Ileus                                    ileus                                   
+Coprostasis                              coprostasis                             
+Meteorism                                meteorism                               
+Enteritis                                enteritis                               
+Gynecological_Findings                   gynecological_findings                  
+
+============================================================
+MISSING VALUE ANALYSIS - Integrated Dataset
+============================================================
+Overall Missing Data : 28,719 cells (30.64% of all data)
+Columns with Missing Values : 58 out of 60
+
+EXPECTED MISSING VALUES
+------------------------------------------------------------
+Diagnosis_Presumptive                 782 (50.06%)
+Reason : Column unavailable in Dataset 2 during integration.
+Action : Retain column. Handle during preprocessing if needed.
+
+
+COLUMNS REQUIRING PREPROCESSING
+------------------------------------------------------------
+Column Name                              Missing      Percent      Status            
+------------------------------------------------------------------------------------------
+Abscess_Location                         1536         98.34      % Critical          
+Gynecological_Findings                   1510         96.67      % Critical          
+Conglomerate_of_Bowel_Loops              1476         94.49      % Critical          
+Segmented_Neutrophils                    1454         93.09      % Critical          
+Ileus                                    1442         92.32      % Critical          
+Perfusion                                1436         91.93      % Critical          
+Enteritis                                1431         91.61      % Critical          
+Appendicolith                            1424         91.17      % Critical          
+Coprostasis                              1420         90.91      % Critical          
+Perforation                              1400         89.63      % Critical          
+Appendicular_Abscess                     1392         89.12      % Critical          
+Bowel_Wall_Thickening                    1364         87.32      % Critical          
+Lymph_Nodes_Location                     1321         84.57      % Critical          
+Target_Sign                              1286         82.33      % Critical          
+Meteorism                                1282         82.07      % Critical          
+Pathological_Lymph_Nodes                 1157         74.07      % Critical          
+Appendix_Wall_Layers                     1126         72.09      % Critical          
+Surrounding_Tissue_Reaction              1059         67.80      % Critical          
+Appendix_Diameter                        567          36.30      % Poor              
+RBC_in_Urine                             410          26.25      % Poor              
+Ketones_in_Urine                         398          25.48      % Poor              
+WBC_in_Urine                             396          25.35      % Poor              
+Ipsilateral_Rebound_Tenderness           325          20.81      % Poor              
+Neutrophil_Percentage                    205          13.12      % Fair              
+Free_Fluids                              125          8.00       % Fair              
+Paedriatic_Appendicitis_Score            103          6.59       % Fair              
+Alvarado_Score                           103          6.59       % Fair              
+Neutrophilia                             99           6.34       % Fair              
+Psoas_Sign                               72           4.61       % Good              
+Dysuria                                  57           3.65       % Good              
+BMI                                      53           3.39       % Good              
+Height                                   51           3.27       % Good              
+RDW                                      51           3.27       % Good              
+US_Number                                43           2.75       % Good              
+Thrombocyte_Count                        35           2.24       % Good              
+Hemoglobin                               35           2.24       % Good              
+RBC_Count                                35           2.24       % Good              
+Stool                                    33           2.11       % Good              
+Coughing_Pain                            31           1.98       % Good              
+Contralateral_Rebound_Tenderness         29           1.86       % Good              
+CRP                                      21           1.34       % Good              
+Loss_of_Appetite                         19           1.22       % Good              
+Migratory_Pain                           17           1.09       % Good              
+Peritonitis                              17           1.09       % Good              
+Nausea                                   15           0.96       % Good              
+Lower_Right_Abd_Pain                     15           0.96       % Good              
+Body_Temperature                         13           0.83       % Good              
+WBC_Count                                11           0.70       % Good              
+Appendix_on_US                           9            0.58       % Good              
+Length_of_Stay                           7            0.45       % Good              
+US_Performed                             7            0.45       % Good              
+Weight                                   5            0.32       % Good              
+Diagnosis                                3            0.19       % Good              
+Sex                                      3            0.19       % Good              
+Severity                                 1            0.06       % Good              
+Management                               1            0.06       % Good              
+Age                                      1            0.06       % Good              
+Source_Dataset                           0            0.00       % Complete          
+Patient_Record_ID                        0            0.00       % Complete          
+
+============================================================
+DATA AUDIT COMPLETED
+============================================================
