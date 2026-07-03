@@ -24,7 +24,8 @@ LEAKAGE_COLUMNS = [
     "Paedriatic_Appendicitis_Score",
     "Patient_Record_ID",
     "Source_Dataset",
-    "Severity"
+    "Severity",
+    "US_Number"
 ]
 
 RANDOM_STATE = 42

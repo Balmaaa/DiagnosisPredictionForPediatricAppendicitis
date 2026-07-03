@@ -4,7 +4,7 @@ import random
 import pickle
 from pathlib import Path
 from datetime import datetime
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_validate
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 import matplotlib.pyplot as plt
@@ -97,7 +97,13 @@ class GradientBoostingModel:
 
     def hyperparameter_tuning(self, X_train, y_train):
         print("Performing hyperparameter tuning...")
-        param_grid = {"n_estimators": [100, 200], "learning_rate": [0.01, 0.05, 0.1], "max_depth": [3, 5], "subsample": [0.8, 1.0]}
+        param_grid = {
+            "n_estimators": [50, 100, 150],
+            "learning_rate": [0.01, 0.03, 0.05],
+            "max_depth": [2, 3],
+            "min_samples_leaf": [5, 10],
+            "subsample": [0.7, 0.8]
+        }
         gb = GradientBoostingClassifier(random_state=SEED)
         grid = GridSearchCV(gb, param_grid, cv=5, scoring="recall", n_jobs=-1, verbose=1)
         grid.fit(X_train, y_train)
@@ -105,8 +111,27 @@ class GradientBoostingModel:
 
         print("\nBest Params:", grid.best_params_)
         print("Best CV Recall:", grid.best_score_)
-
+        print("\nBest Estimator")
+        print(grid.best_estimator_)
+        
         return self.model
+
+    # ============================================================
+    # CROSS VALIDATION
+    # ============================================================
+
+    def cross_validate_model(self, X_train, y_train):
+        print("\n" + "=" * 70)
+        print("10-FOLD CROSS VALIDATION")
+        print("=" * 70)
+
+        cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=SEED)
+        scores = cross_validate(self.model, X_train, y_train, cv=cv, scoring=["accuracy", "precision", "recall", "f1"], n_jobs=-1)
+
+        print(f"Accuracy : {scores['test_accuracy'].mean():.4f} ± {scores['test_accuracy'].std():.4f}")
+        print(f"Precision: {scores['test_precision'].mean():.4f} ± {scores['test_precision'].std():.4f}")
+        print(f"Recall   : {scores['test_recall'].mean():.4f} ± {scores['test_recall'].std():.4f}")
+        print(f"F1 Score : {scores['test_f1'].mean():.4f} ± {scores['test_f1'].std():.4f}")
 
     # ============================================================
     # EVALUATION
@@ -139,6 +164,19 @@ class GradientBoostingModel:
         }
 
     # ============================================================
+    # FEATURE IMPORTANCE
+    # ============================================================
+
+    def show_feature_importance(self, top_n=20):
+        importance = pd.DataFrame({"Feature": self.feature_names, "Importance": self.model.feature_importances_})
+        importance = importance.sort_values(by="Importance", ascending=False)
+        print("\n" + "=" * 70)
+        print(f"TOP {top_n} IMPORTANT FEATURES")
+        print("=" * 70)
+        print(importance.head(top_n).to_string(index=False))
+        return importance
+
+    # ============================================================
     # SAVE MODEL (GUI COMPATIBLE)
     # ============================================================
 
@@ -166,7 +204,7 @@ def main():
     gb = GradientBoostingModel()
     X_train, X_test, y_train, y_test = gb.load_pipeline_data()
     gb.train(X_train, y_train, use_hyperparameter_tuning=True)
-
+    gb.cross_validate_model(X_train, y_train)
     train_predictions = gb.model.predict(X_train)
     train_accuracy = accuracy_score(y_train, train_predictions)
 
@@ -176,6 +214,7 @@ def main():
     print(f"Training Accuracy : {train_accuracy:.4f}")
 
     metrics = gb.evaluate(X_test, y_test)
+    importance = gb.show_feature_importance()
 
     print("\n" + "=" * 70)
     print("RESULTS")

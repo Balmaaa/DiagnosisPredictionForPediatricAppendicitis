@@ -10,7 +10,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (StandardScaler, OneHotEncoder, LabelEncoder)
 from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
-
+from sklearn.model_selection import StratifiedShuffleSplit
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -31,6 +31,7 @@ LEAKAGE_COLUMNS = [
     "Patient_Record_ID",
     "Source_Dataset",
     "Severity"
+    "US_Number"
 ]
 
 RANDOM_STATE = 42
@@ -350,6 +351,10 @@ def preprocess_dataset(df, output_file):
     # ---------------------------------------
 
     X = remove_leakage_columns(X, output_file)
+    
+    if "Source_Dataset" in X.columns:
+        X = X.drop(columns=["Source_Dataset"])
+
     X = normalize_categorical_values(X, output_file)
 
     if "Lymph_Nodes_Location" in X.columns:
@@ -402,7 +407,13 @@ def preprocess_dataset(df, output_file):
     numeric_columns, categorical_columns = identify_column_types(X, output_file)
 
     print_save("\nCreating Train/Test Split...", output_file)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, stratify=y, random_state=RANDOM_STATE)
+    split = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=RANDOM_STATE)
+    for train_idx, test_idx in split.split(X, y):
+        X_train = X.iloc[train_idx]
+        X_test = X.iloc[test_idx]
+        y_train = y.iloc[train_idx]
+        y_test = y.iloc[test_idx]
+
     print_save(f"Train Shape : {X_train.shape}", output_file)
     print_save(f"Test Shape : {X_test.shape}", output_file)
 
