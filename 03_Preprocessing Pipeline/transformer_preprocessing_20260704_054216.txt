@@ -20,7 +20,7 @@ Test Shape : (312, 74)
 Target successfully encoded.
 Feature Info Built : 74 features
 Pipeline Saved:
-C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\transformer_pipeline_20260704_050526.pkl
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\transformer_pipeline_20260704_054216.pkl
 Total Numerical Features : 42
 Total Categorical Features : 32
 Total Features : 74

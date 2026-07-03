@@ -30,7 +30,7 @@ LEAKAGE_COLUMNS = [
     "Paedriatic_Appendicitis_Score",
     "Patient_Record_ID",
     "Source_Dataset",
-    "Severity"
+    "Severity",
     "US_Number"
 ]
 
@@ -354,6 +354,9 @@ def preprocess_dataset(df, output_file):
     
     if "Source_Dataset" in X.columns:
         X = X.drop(columns=["Source_Dataset"])
+
+    if "US_Number" in X.columns:
+        X = X.drop(columns=["US_Number"])
 
     X = normalize_categorical_values(X, output_file)
 

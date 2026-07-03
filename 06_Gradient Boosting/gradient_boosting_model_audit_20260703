@@ -2,7 +2,7 @@
 GRADIENT BOOSTING - PIPELINE VERSION
 ======================================================================
 USING UPDATED GRADIENT BOOSTING (PIPELINE-COMPATIBLE)
-Loading pipeline: preprocessing_pipeline_20260703_230053.pkl
+Loading pipeline: preprocessing_pipeline_20260704_054159.pkl
 
 FEATURES USED BY THE MODEL
 ----------------------------------------------------------------------
@@ -23,7 +23,6 @@ Ketones_in_Urine
 RBC_in_Urine
 WBC_in_Urine
 CRP
-US_Number
 Appendix_Diameter_Missing
 Neutrophil_Percentage_Missing
 Segmented_Neutrophils_Missing
@@ -159,40 +158,77 @@ Enteritis_No
 Enteritis_Unknown
 Enteritis_Yes
 ----------------------------------------------------------------------
-Total Features: 152
+Total Features: 151
 
 Dataset Information
 ----------------------------------------------------------------------
 Training samples : 1247
 Testing samples  : 312
-Features         : 152
+Features         : 151
 
 Training Gradient Boosting...
 Performing hyperparameter tuning...
-Fitting 5 folds for each of 24 candidates, totalling 120 fits
+Fitting 5 folds for each of 72 candidates, totalling 360 fits
 
-Best Params: {'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 200, 'subsample': 1.0}
-Best CV Recall: 0.9743156668608037
+Best Params: {'learning_rate': 0.05, 'max_depth': 3, 'min_samples_leaf': 10, 'n_estimators': 150, 'subsample': 0.8}
+Best CV Recall: 0.9525917297612114
+
+Best Estimator
+GradientBoostingClassifier(learning_rate=0.05, min_samples_leaf=10,
+                           n_estimators=150, random_state=42, subsample=0.8)
 Training completed.
-Number of estimators: 200
+Number of estimators: 150
+
+======================================================================
+10-FOLD CROSS VALIDATION
+======================================================================
+Accuracy : 0.9567 ± 0.0209
+Precision: 0.9507 ± 0.0282
+Recall   : 0.9427 ± 0.0357
+F1 Score : 0.9463 ± 0.0263
 
 ======================================================================
 TRAINING PERFORMANCE
 ======================================================================
-Training Accuracy : 1.0000
+Training Accuracy : 0.9880
+
+======================================================================
+TOP 20 IMPORTANT FEATURES
+======================================================================
+                               Feature  Importance
+                     Appendix_Diameter    0.365771
+                     Appendix_on_US_No    0.187118
+     Ipsilateral_Rebound_Tenderness_No    0.066911
+                                   CRP    0.065923
+                             WBC_Count    0.053069
+Ipsilateral_Rebound_Tenderness_Unknown    0.044324
+                        Peritonitis_No    0.033831
+Ipsilateral_Rebound_Tenderness_Missing    0.032025
+                    Appendix_on_US_Yes    0.022393
+             Appendix_Diameter_Missing    0.016137
+                 Neutrophil_Percentage    0.010637
+   Surrounding_Tissue_Reaction_Missing    0.008978
+   Contralateral_Rebound_Tenderness_No    0.008141
+                             Nausea_No    0.006572
+       Surrounding_Tissue_Reaction_Yes    0.006359
+                            Hemoglobin    0.005943
+                     Thrombocyte_Count    0.005721
+   Surrounding_Tissue_Reaction_Unknown    0.004680
+                       US_Performed_No    0.004150
+                                   RDW    0.003653
 
 ======================================================================
 RESULTS
 ======================================================================
-Accuracy     : 0.9936
-Precision    : 1.0000
-Recall       : 0.9843
-Specificity  : 1.0000
-PPV          : 1.0000
-NPV          : 0.9893
+Accuracy     : 0.9519
+Precision    : 0.9375
+Recall       : 0.9449
+Specificity  : 0.9568
+PPV          : 0.9375
+NPV          : 0.9620
 CONFUSION MATRIX:
-TP=125
-TN=185
-FP=0
-FN=2
+TP=120
+TN=177
+FP=8
+FN=7
 Model saved to GUI folder: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\GradientBoosting.pkl

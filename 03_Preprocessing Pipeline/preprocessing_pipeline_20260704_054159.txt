@@ -35,8 +35,10 @@ Removed : Alvarado_Score
 Removed : Paedriatic_Appendicitis_Score
 Removed : Patient_Record_ID
 Removed : Source_Dataset
+Removed : Severity
+Removed : US_Number
 
-Leakage Columns Removed : 8
+Leakage Columns Removed : 10
 
 ============================================================
 NORMALIZING CATEGORICAL VARIABLES
@@ -78,19 +80,6 @@ Category                                          Count
 Male                                                806
 Female                                              751
 <Missing>                                             2
-----------------------------------------------------------------------
-
-======================================================================
-Feature : Severity
-======================================================================
-Number of Unique Categories : 2
-
-Categories:
-----------------------------------------------------------------------
-Category                                          Count
-----------------------------------------------------------------------
-uncomplicated                                      1321
-complicated                                         238
 ----------------------------------------------------------------------
 
 ======================================================================
@@ -544,7 +533,7 @@ No                                                   30
 ============================================================
 FEATURE TYPE IDENTIFICATION
 ============================================================
-Numeric Features : 43
+Numeric Features : 42
    Age
    BMI
    Height
@@ -562,7 +551,6 @@ Numeric Features : 43
    RBC_in_Urine
    WBC_in_Urine
    CRP
-   US_Number
    Appendix_Diameter_Missing
    Neutrophil_Percentage_Missing
    Segmented_Neutrophils_Missing
@@ -589,9 +577,8 @@ Numeric Features : 43
    Meteorism_Missing
    Enteritis_Missing
 
-Categorical Features : 33
+Categorical Features : 32
    Sex
-   Severity
    Appendix_on_US
    Migratory_Pain
    Lower_Right_Abd_Pain
@@ -625,8 +612,8 @@ Categorical Features : 33
    Enteritis
 
 Creating Train/Test Split...
-Train Shape : (1247, 76)
-Test Shape : (312, 76)
+Train Shape : (1247, 74)
+Test Shape : (312, 74)
 
 ============================================================
 BUILDING PREPROCESSING PIPELINE
@@ -634,7 +621,7 @@ BUILDING PREPROCESSING PIPELINE
 Preprocessing pipeline successfully created.
 
 Fitting preprocessing pipeline...
-Processed Shape : (1247, 154)
+Processed Shape : (1247, 151)
 
 ORDINAL FEATURE CHECK
 Ketones_in_Urine
@@ -646,9 +633,9 @@ WBC_in_Urine_Missing
 
 Feature Reduction Summary
 Original Features : 59
-Features After Leakage Removal : 76
-Encoded Features : 154
-Final Feature Count : 154
+Features After Leakage Removal : 74
+Encoded Features : 151
+Final Feature Count : 151
 
 Target Encoding
 appendicitis -> 0
@@ -656,16 +643,16 @@ no appendicitis -> 1
 
 Remaining Missing Values : 0
 Saved preprocessing pipeline:
-C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\preprocessing_pipeline_20260704_050430.pkl
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\preprocessing_pipeline_20260704_054159.pkl
 
 ============================================================
 PREPROCESSING SUMMARY
 ============================================================
 Original Samples : 1562
 Processed Samples : 1559
-Final Features : 154
+Final Features : 151
 Target Column : Diagnosis
-Leakage Columns Removed : 9
+Leakage Columns Removed : 10
    • Diagnosis_Presumptive
    • Gynecological_Findings
    • Management
@@ -674,7 +661,8 @@ Leakage Columns Removed : 9
    • Paedriatic_Appendicitis_Score
    • Patient_Record_ID
    • Source_Dataset
-   • SeverityUS_Number
+   • Severity
+   • US_Number
 
 ============================================================
 DATA PREPROCESSING COMPLETED SUCCESSFULLY
