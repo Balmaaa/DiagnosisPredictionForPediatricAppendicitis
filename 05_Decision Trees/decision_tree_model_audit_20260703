@@ -1,0 +1,21 @@
+======================================================================
+DECISION TREE - GUI COMPATIBLE VERSION
+======================================================================
+USING GUI-COMPATIBLE DECISION TREE MODEL
+Loading pipeline: preprocessing_pipeline_20260626_180722.pkl
+
+Training Decision Tree...
+Training completed.
+Tree depth: 5
+Number of leaves: 24
+
+======================================================================
+RESULTS
+======================================================================
+Accuracy     : 0.8173
+Precision    : 0.7160
+Recall       : 0.9134
+Specificity  : 0.7514
+PPV          : 0.7160
+NPV          : 0.9267
+Model saved for GUI: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\DecisionTree.pkl
