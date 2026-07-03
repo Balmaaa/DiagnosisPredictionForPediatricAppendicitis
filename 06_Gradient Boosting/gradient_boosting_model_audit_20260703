@@ -1,0 +1,25 @@
+======================================================================
+GRADIENT BOOSTING - PIPELINE VERSION
+======================================================================
+USING UPDATED GRADIENT BOOSTING (PIPELINE-COMPATIBLE)
+Loading pipeline: preprocessing_pipeline_20260626_180722.pkl
+
+Training Gradient Boosting...
+Performing hyperparameter tuning...
+Fitting 5 folds for each of 24 candidates, totalling 120 fits
+
+Best Params: {'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 200, 'subsample': 1.0}
+Best CV Recall: 0.9743156668608037
+Training completed.
+Number of estimators: 200
+
+======================================================================
+RESULTS
+======================================================================
+Accuracy     : 0.9936
+Precision    : 1.0000
+Recall       : 0.9843
+Specificity  : 1.0000
+PPV          : 1.0000
+NPV          : 0.9893
+Model saved to GUI folder: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\GradientBoosting.pkl
