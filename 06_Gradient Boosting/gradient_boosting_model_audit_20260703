@@ -4,6 +4,169 @@ GRADIENT BOOSTING - PIPELINE VERSION
 USING UPDATED GRADIENT BOOSTING (PIPELINE-COMPATIBLE)
 Loading pipeline: preprocessing_pipeline_20260626_180722.pkl
 
+FEATURES USED BY THE MODEL
+----------------------------------------------------------------------
+Age
+BMI
+Height
+Weight
+Appendix_Diameter
+Body_Temperature
+WBC_Count
+Neutrophil_Percentage
+Segmented_Neutrophils
+RBC_Count
+Hemoglobin
+RDW
+Thrombocyte_Count
+Ketones_in_Urine
+RBC_in_Urine
+WBC_in_Urine
+CRP
+US_Number
+Appendix_Diameter_Missing
+Neutrophil_Percentage_Missing
+Segmented_Neutrophils_Missing
+Neutrophilia_Missing
+Ketones_in_Urine_Missing
+RBC_in_Urine_Missing
+WBC_in_Urine_Missing
+Ipsilateral_Rebound_Tenderness_Missing
+Free_Fluids_Missing
+Appendix_Wall_Layers_Missing
+Target_Sign_Missing
+Appendicolith_Missing
+Perfusion_Missing
+Perforation_Missing
+Surrounding_Tissue_Reaction_Missing
+Appendicular_Abscess_Missing
+Abscess_Location_Missing
+Pathological_Lymph_Nodes_Missing
+Lymph_Nodes_Location_Missing
+Bowel_Wall_Thickening_Missing
+Conglomerate_of_Bowel_Loops_Missing
+Ileus_Missing
+Coprostasis_Missing
+Meteorism_Missing
+Enteritis_Missing
+Sex_Female
+Sex_Male
+Appendix_on_US_No
+Appendix_on_US_Unknown
+Appendix_on_US_Yes
+Migratory_Pain_No
+Migratory_Pain_Unknown
+Migratory_Pain_Yes
+Lower_Right_Abd_Pain_No
+Lower_Right_Abd_Pain_Unknown
+Lower_Right_Abd_Pain_Yes
+Contralateral_Rebound_Tenderness_No
+Contralateral_Rebound_Tenderness_Unknown
+Contralateral_Rebound_Tenderness_Yes
+Coughing_Pain_No
+Coughing_Pain_Unknown
+Coughing_Pain_Yes
+Nausea_No
+Nausea_Unknown
+Nausea_Yes
+Loss_of_Appetite_No
+Loss_of_Appetite_Unknown
+Loss_of_Appetite_Yes
+Neutrophilia_No
+Neutrophilia_Unknown
+Neutrophilia_Yes
+Dysuria_No
+Dysuria_Unknown
+Dysuria_Yes
+Stool_Unknown
+Stool_constipation
+Stool_constipation, diarrhea
+Stool_diarrhea
+Stool_normal
+Peritonitis_No
+Peritonitis_Unknown
+Peritonitis_generalized
+Peritonitis_local
+Psoas_Sign_No
+Psoas_Sign_Unknown
+Psoas_Sign_Yes
+Ipsilateral_Rebound_Tenderness_No
+Ipsilateral_Rebound_Tenderness_Unknown
+Ipsilateral_Rebound_Tenderness_Yes
+US_Performed_No
+US_Performed_Unknown
+US_Performed_Yes
+Free_Fluids_No
+Free_Fluids_Unknown
+Free_Fluids_Yes
+Appendix_Wall_Layers_Unknown
+Appendix_Wall_Layers_intact
+Appendix_Wall_Layers_partially raised
+Appendix_Wall_Layers_raised
+Appendix_Wall_Layers_upset
+Target_Sign_No
+Target_Sign_Unknown
+Target_Sign_Yes
+Appendicolith_No
+Appendicolith_Unknown
+Appendicolith_Yes
+Appendicolith_suspected
+Perfusion_No
+Perfusion_Unknown
+Perfusion_hyperperfused
+Perfusion_hypoperfused
+Perfusion_present
+Perforation_No
+Perforation_Unknown
+Perforation_Yes
+Perforation_not excluded
+Perforation_suspected
+Surrounding_Tissue_Reaction_No
+Surrounding_Tissue_Reaction_Unknown
+Surrounding_Tissue_Reaction_Yes
+Appendicular_Abscess_No
+Appendicular_Abscess_Unknown
+Appendicular_Abscess_Yes
+Appendicular_Abscess_suspected
+Abscess_Location_Other
+Abscess_Location_Unknown
+Abscess_Location_douglas_pouch
+Pathological_Lymph_Nodes_No
+Pathological_Lymph_Nodes_Unknown
+Pathological_Lymph_Nodes_Yes
+Lymph_Nodes_Location_Other
+Lymph_Nodes_Location_Unknown
+Lymph_Nodes_Location_ileocecal
+Lymph_Nodes_Location_mesenteric
+Lymph_Nodes_Location_right_lower_quadrant
+Lymph_Nodes_Location_right_mid_abdomen
+Bowel_Wall_Thickening_No
+Bowel_Wall_Thickening_Unknown
+Bowel_Wall_Thickening_Yes
+Conglomerate_of_Bowel_Loops_No
+Conglomerate_of_Bowel_Loops_Unknown
+Conglomerate_of_Bowel_Loops_Yes
+Ileus_No
+Ileus_Unknown
+Ileus_Yes
+Coprostasis_No
+Coprostasis_Unknown
+Coprostasis_Yes
+Meteorism_No
+Meteorism_Unknown
+Meteorism_Yes
+Enteritis_No
+Enteritis_Unknown
+Enteritis_Yes
+----------------------------------------------------------------------
+Total Features: 152
+
+Dataset Information
+----------------------------------------------------------------------
+Training samples : 1247
+Testing samples  : 312
+Features         : 152
+
 Training Gradient Boosting...
 Performing hyperparameter tuning...
 Fitting 5 folds for each of 24 candidates, totalling 120 fits
@@ -14,6 +177,11 @@ Training completed.
 Number of estimators: 200
 
 ======================================================================
+TRAINING PERFORMANCE
+======================================================================
+Training Accuracy : 1.0000
+
+======================================================================
 RESULTS
 ======================================================================
 Accuracy     : 0.9936
@@ -22,4 +190,9 @@ Recall       : 0.9843
 Specificity  : 1.0000
 PPV          : 1.0000
 NPV          : 0.9893
+CONFUSION MATRIX:
+TP=125
+TN=185
+FP=0
+FN=2
 Model saved to GUI folder: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\GradientBoosting.pkl

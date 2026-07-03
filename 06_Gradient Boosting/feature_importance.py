@@ -1,163 +1,138 @@
-"""
-Simple Feature Importance Visualization - Gradient Boosting Model
-Loads saved model and displays feature importance with horizontal bar graph
-"""
-
-import pickle
-import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
+import random
+import pickle
 from pathlib import Path
-import sys
-import os
+import matplotlib.pyplot as plt
 
-# Add parent directory to path for imports
-sys.path.append(str(Path(__file__).parent.parent))
-from unified_data_preprocessing import prepare_unified_data
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import recall_score
+from sklearn.inspection import permutation_importance
 
-def load_gradient_boosting_model():
-    """Load the most recent Gradient Boosting model"""
-    model_dir = Path(__file__).parent
-    
-    # Look for the most recent model file
-    model_files = list(model_dir.glob("gradient_boosting_model_*.pkl"))
-    if not model_files:
-        raise FileNotFoundError("No Gradient Boosting model files found")
-    
-    # Use the most recent model (fair comparison if available)
-    fair_models = [f for f in model_files if "fair" in f.name]
-    if fair_models:
-        model_file = fair_models[0]
-    else:
-        model_file = sorted(model_files)[-1]
-    
-    print(f"Loading model: {model_file.name}")
-    
-    with open(model_file, 'rb') as f:
-        model_data = pickle.load(f)
-    
-    # Extract model and feature names from dictionary
-    if isinstance(model_data, dict):
-        if 'model' in model_data:
-            model = model_data['model']
-        elif 'best_estimator_' in model_data:
-            model = model_data['best_estimator_']
-        elif 'trained_model' in model_data:
-            model = model_data['trained_model']
-        else:
-            # Assume the dictionary itself contains the model
-            model = model_data
-        
-        # Extract feature names from saved model
-        feature_names = model_data.get('feature_names', None)
-    else:
-        model = model_data
-        feature_names = None
-    
-    return model, feature_names
+SEED = 42
+np.random.seed(SEED)
+random.seed(SEED)
+
+
+# ============================================================
+# LOAD PIPELINE DATA
+# ============================================================
+
+def load_pipeline_data():
+    preprocess_dir = Path(__file__).resolve().parents[1] / "03_Preprocessing Pipeline"
+    X_test = pd.read_csv(preprocess_dir / "X_test.csv")
+    y_test = pd.read_csv(preprocess_dir / "y_test.csv").values.ravel()
+    return X_test, y_test
+
 
 def get_feature_names():
-    """Get feature names from unified data preprocessing"""
-    _, _, _, _, feature_names, _, _ = prepare_unified_data('CSV')
-    return feature_names
+    preprocess_dir = (Path(__file__).resolve().parents[1] / "03_Preprocessing Pipeline")
+    pipeline_files = sorted(preprocess_dir.glob("preprocessing_pipeline_*.pkl"))
+    if not pipeline_files:
+        raise FileNotFoundError("No preprocessing pipeline found")
 
-def plot_feature_importance_horizontal(model, feature_names, top_n=15):
-    """Create horizontal bar plot of feature importance"""
-    
-    # Get feature importance
-    if hasattr(model, 'feature_importances_'):
-        importance = model.feature_importances_
-    else:
-        raise AttributeError("Model does not have feature_importances_ attribute")
-    
-    # Create DataFrame for easier handling
-    feature_importance_df = pd.DataFrame({
-        'Feature': feature_names,
-        'Importance': importance
-    })
-    
-    # Sort by importance and get top features
-    feature_importance_df = feature_importance_df.sort_values('Importance', ascending=True)
-    top_features = feature_importance_df.tail(top_n)
-    
-    # Create horizontal bar plot
+    pipeline_path = pipeline_files[-1]
+    with open(pipeline_path, "rb") as f:
+        pipeline = pickle.load(f)
+
+    return pipeline["feature_names"]
+
+
+# ============================================================
+# LOAD MODEL
+# ============================================================
+
+def load_gradient_boosting_model():
+    model_path = (Path(__file__).resolve().parents[1] / "09_GUI Application" / "saved_models" / "GradientBoosting.pkl")
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model not found at:\n{model_path}\n\n" "Run GradientBoostingModel first to generate it.")
+
+    print(f"Loading model: {model_path.name}")
+
+    with open(model_path, "rb") as f:
+        model_data = pickle.load(f)
+
+    model = model_data["model"]
+    feature_names = model_data.get("feature_names", None)
+    return model, feature_names
+
+
+# ============================================================
+# PERMUTATION FEATURE IMPORTANCE (RECALL)
+# ============================================================
+
+def permutation_feature_importance(model, X_test, y_test, feature_names, top_n=15, n_repeats=30):
+    print("\nComputing permutation feature importance (Recall)...")
+    result = permutation_importance(estimator=model, X=X_test, y=y_test, scoring="recall", n_repeats=n_repeats, random_state=SEED, n_jobs=-1)
+    importance_df = pd.DataFrame({"Feature": feature_names, "Importance": result.importances_mean, "Std": result.importances_std})
+    importance_df = importance_df.sort_values(by="Importance", ascending=False)
+    return importance_df.head(top_n)
+
+
+# ============================================================
+# PLOT IMPORTANCE
+# ============================================================
+
+def plot_permutation_importance(importance_df):
     plt.figure(figsize=(10, 8))
-    bars = plt.barh(range(len(top_features)), top_features['Importance'], 
-                    color='lightgreen', edgecolor='darkgreen', alpha=0.8)
-    
-    # Customize plot
-    plt.title(f'Gradient Boosting - Top {top_n} Feature Importance', 
-              fontsize=14, fontweight='bold', pad=20)
-    plt.xlabel('Importance Score', fontsize=12)
-    plt.ylabel('Features', fontsize=12)
-    
-    # Set y-axis labels
-    plt.yticks(range(len(top_features)), top_features['Feature'])
-    
-    # Add value labels on bars
-    for i, (bar, imp) in enumerate(zip(bars, top_features['Importance'])):
-        plt.text(bar.get_width() + 0.001, bar.get_y() + bar.get_height()/2, 
-                f'{imp:.3f}', ha='left', va='center', fontsize=10)
-    
-    # Add grid
-    plt.grid(axis='x', alpha=0.3)
-    
-    # Adjust layout
+    plot_df = importance_df.iloc[::-1]
+    plt.barh(plot_df["Feature"], plot_df["Importance"], xerr=plot_df["Std"], color="lightgreen", edgecolor="darkgreen", alpha=0.8)
+    plt.xlabel("Mean Recall Decrease")
+    plt.ylabel("Feature")
+    plt.title("Gradient Boosting Permutation Feature Importance")
+    plt.grid(axis="x", alpha=0.3)
     plt.tight_layout()
-    
-    # Save plot
-    output_file = Path(__file__).parent / "feature_importance_horizontal.png"
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"Feature importance plot saved as: {output_file}")
-    
-    # Show plot
+    save_path = Path(__file__).parent / "gradient_boosting_permutation_importance.png"
+    plt.savefig(save_path, dpi=300)
     plt.show()
-    
-    return top_features
 
-def print_feature_ranking(top_features):
-    """Print feature ranking in a nice format"""
-    print("\n" + "="*60)
-    print("GRADIENT BOOSTING - FEATURE IMPORTANCE RANKING")
-    print("="*60)
-    
-    # Print in ascending order (least to most important)
-    for i, (idx, row) in enumerate(top_features.iterrows()):
-        rank = len(top_features) - i
-        print(f"{rank:2d}. {row['Feature']:<30} {row['Importance']:.4f}")
-    
-    print("="*60)
+    print(f"Saved figure to {save_path}")
+
+
+# ============================================================
+# PRINT RANKING
+# ============================================================
+
+def print_feature_ranking(df):
+    print("\n")
+    print("=" * 70)
+    print("GRADIENT BOOSTING PERMUTATION FEATURE IMPORTANCE")
+    print("=" * 70)
+
+    for i, row in enumerate(df.itertuples()):
+        print(f"{i+1:2d}. " f"{row.Feature:<35}" f"{row.Importance:.5f}")
+
+    print("=" * 70)
+
+
+# ============================================================
+# MAIN
+# ============================================================
 
 def main():
-    """Main function to run feature importance analysis"""
-    try:
-        print("Gradient Boosting Feature Importance Analysis")
-        print("-" * 50)
-        
-        # Load model and feature names
-        model, saved_feature_names = load_gradient_boosting_model()
-        print(f"Model type: {type(model).__name__}")
-        
-        # Use saved feature names if available, otherwise try unified preprocessing
-        if saved_feature_names is not None:
-            feature_names = saved_feature_names
-            print(f"Using saved feature names: {len(feature_names)}")
-        else:
-            feature_names = get_feature_names()
-            print(f"Using unified feature names: {len(feature_names)}")
-        
-        # Create and display horizontal bar plot
-        top_features = plot_feature_importance_horizontal(model, feature_names, top_n=15)
-        
-        # Print ranking
-        print_feature_ranking(top_features)
-        
-        print(f"\nAnalysis completed successfully!")
-        
-    except Exception as e:
-        print(f"Error: {e}")
-        import traceback
-        traceback.print_exc()
+    print("=" * 70)
+    print("GRADIENT BOOSTING - PERMUTATION FEATURE IMPORTANCE")
+    print("=" * 70)
+
+    model, saved_feature_names = load_gradient_boosting_model()
+    X_test, y_test = load_pipeline_data()
+
+    if saved_feature_names is not None:
+        feature_names = saved_feature_names
+    else:
+        feature_names = get_feature_names()
+
+    print(f"\nNumber of features: {len(feature_names)}")
+
+    importance_df = permutation_feature_importance(model=model, X_test=X_test, y_test=y_test, feature_names=feature_names, top_n=15, n_repeats=50)
+    plot_permutation_importance(importance_df)
+    print_feature_ranking(importance_df)
+    csv_path = Path(__file__).parent / "gradient_boosting_permutation_importance.csv"
+    importance_df.to_csv(csv_path, index=False)
+
+    print(f"\nCSV saved to:\n{csv_path}")
+
 
 if __name__ == "__main__":
     main()

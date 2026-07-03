@@ -44,10 +44,25 @@ class GradientBoostingModel:
         self.pipeline = pipeline
         self.feature_names = pipeline["feature_names"]
 
+        print("\nFEATURES USED BY THE MODEL")
+        print("-" * 70)
+
+        for feature in self.feature_names:
+            print(feature)
+
+        print("-" * 70)
+        print(f"Total Features: {len(self.feature_names)}")
+
         X_train = pd.read_csv(preprocess_dir / "X_train.csv")
         X_test = pd.read_csv(preprocess_dir / "X_test.csv")
         y_train = pd.read_csv(preprocess_dir / "y_train.csv").values.ravel()
         y_test = pd.read_csv(preprocess_dir / "y_test.csv").values.ravel()
+
+        print("\nDataset Information")
+        print("-" * 70)
+        print(f"Training samples : {len(X_train)}")
+        print(f"Testing samples  : {len(X_test)}")
+        print(f"Features         : {X_train.shape[1]}")
 
         return X_train, X_test, y_train, y_test
 
@@ -151,6 +166,15 @@ def main():
     gb = GradientBoostingModel()
     X_train, X_test, y_train, y_test = gb.load_pipeline_data()
     gb.train(X_train, y_train, use_hyperparameter_tuning=True)
+
+    train_predictions = gb.model.predict(X_train)
+    train_accuracy = accuracy_score(y_train, train_predictions)
+
+    print("\n" + "=" * 70)
+    print("TRAINING PERFORMANCE")
+    print("=" * 70)
+    print(f"Training Accuracy : {train_accuracy:.4f}")
+
     metrics = gb.evaluate(X_test, y_test)
 
     print("\n" + "=" * 70)
@@ -162,6 +186,11 @@ def main():
     print(f"Specificity  : {metrics['specificity']:.4f}")
     print(f"PPV          : {metrics['ppv']:.4f}")
     print(f"NPV          : {metrics['npv']:.4f}")
+    print("CONFUSION MATRIX:")
+    print(f"TP={metrics['tp']}")
+    print(f"TN={metrics['tn']}")
+    print(f"FP={metrics['fp']}")
+    print(f"FN={metrics['fn']}")
 
     gb.save_model()
 
