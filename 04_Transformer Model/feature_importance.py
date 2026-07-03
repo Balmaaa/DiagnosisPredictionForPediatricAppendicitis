@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import recall_score
 from transformer_model import AdvancedTabularTransformer
 
 
@@ -62,7 +62,7 @@ def load_pipeline():
 ###############################################################################
 
 def load_model(device):
-    checkpoint_path = (Path(__file__).resolve().parents[1] / "09_GUI_Application" / "saved_models" / "Transformer.pt")
+    checkpoint_path = (Path(__file__).resolve().parents[1] / "09_GUI Application" / "saved_models" / "Transformer.pt")
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
     model = AdvancedTabularTransformer(
         feature_info=checkpoint["feature_info"],
@@ -121,8 +121,8 @@ def predict(model, feature_dict, device="cpu", batch_size=64):
 def permutation_feature_importance(model, X_dict, y_true, feature_names, numerical_features, device="cpu", n_repeats=5):
     print("\nComputing permutation feature importance...")
     baseline_predictions = predict(model, X_dict, device)
-    baseline_accuracy = accuracy_score(y_true, baseline_predictions)
-    print(f"Baseline Accuracy : {baseline_accuracy:.4f}")
+    baseline_recall = recall_score(y_true, baseline_predictions)
+    print(f"Baseline Recall : {baseline_recall:.4f}")
     importance_scores = []
 
     for feature in feature_names:
@@ -147,8 +147,8 @@ def permutation_feature_importance(model, X_dict, y_true, feature_names, numeric
                 permuted[feature] = shuffled
 
             predictions = predict(model, permuted, device)
-            accuracy = accuracy_score(y_true, predictions)
-            scores.append(baseline_accuracy - accuracy)
+            recall = recall_score(y_true, predictions)
+            scores.append(baseline_recall - recall)
 
         importance_scores.append(np.mean(scores))
 

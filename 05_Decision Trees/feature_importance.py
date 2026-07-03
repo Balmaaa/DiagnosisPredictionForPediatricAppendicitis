@@ -4,7 +4,7 @@ import pickle
 import random
 from pathlib import Path
 from datetime import datetime
-
+from sklearn.inspection import permutation_importance
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
 import matplotlib.pyplot as plt
@@ -108,33 +108,28 @@ class DecisionTreeModel:
     # FEATURE IMPORTANCE
     # ============================================================
 
-    def feature_importance(self, top_n=15):
-        importances = self.model.feature_importances_
-        df = pd.DataFrame({"Feature": self.feature_names, "Importance": importances}).sort_values("Importance", ascending=False)
-        return df.head(top_n)
+    def permutation_feature_importance(self, X_test, y_test, top_n=15, n_repeats=30):
+        result = permutation_importance(estimator=self.model, X=X_test, y=y_test, scoring="recall", n_repeats=n_repeats, random_state=SEED, n_jobs=-1)
+        importance_df = pd.DataFrame({"Feature": self.feature_names, "Importance": result.importances_mean, "Std": result.importances_std})
+        importance_df = importance_df.sort_values(by="Importance", ascending=False)
+        return importance_df.head(top_n)
 
     # ============================================================
     # PLOT IMPORTANCE
     # ============================================================
 
-    def plot_importance(self, df, top_n=15):
-        top_df = df.head(top_n).iloc[::-1]
-        plt.figure(figsize=(10, 6))
-        plt.barh(top_df["Feature"], top_df["Importance"], color="steelblue")
+    def plot_permutation_importance(self, importance_df):
+        plt.figure(figsize=(10,6))
+        plot_df = importance_df.iloc[::-1]
+        plt.barh(plot_df["Feature"], plot_df["Importance"], xerr=plot_df["Std"], capsize=3,color="steelblue")
+        plt.xlabel("Permutation Importance")
         plt.title("Decision Tree Feature Importance")
-        plt.xlabel("Importance Score")
-
-        for i, v in enumerate(top_df["Importance"]):
-            plt.text(v + 0.001, i, f"{v:.3f}")
-
         plt.tight_layout()
-        save_path = Path(__file__).parent / "decision_tree_feature_importance.png"
+        save_path = Path(__file__).parent / "decision_tree_permutation_importance.png"
+        importance_df.to_csv(Path(__file__).parent / "decision_tree_permutation_importance.csv", index=False)
         plt.savefig(save_path, dpi=300)
         plt.show()
-
-        print(f"Saved plot: {save_path}")
-
-        return df
+        print(f"Saved figure to {save_path}")
 
     # ============================================================
     # SAVE MODEL
@@ -174,11 +169,10 @@ def main():
     print(f"PPV          : {metrics['ppv']:.4f}")
     print(f"NPV          : {metrics['npv']:.4f}")
 
-    fi = dt.feature_importance()
-    print("\nTop Features:")
+    fi = dt.permutation_feature_importance(X_test, y_test, top_n=15, n_repeats=50)
+    print("\nPermutation Feature Importance")
     print(fi)
-
-    dt.plot_importance(fi)
+    dt.plot_permutation_importance(fi)
     dt.save_model()
 
 

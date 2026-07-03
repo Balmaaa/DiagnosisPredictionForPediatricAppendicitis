@@ -45,23 +45,23 @@ ehthumbs.db
 Thumbs.db
 
 # Machine Learning models (too large for GitHub)
-*.pkl
+# *.pkl
 *.joblib
 *.h5
 *.hdf5
 
 # Large datasets
-*.csv
-*.xlsx
-*.xls
-Dataset 1/
-Dataset 2/
+# *.csv
+# *.xlsx
+# *.xls
+# Dataset 1/
+# Dataset 2/
 
 # Large files
-*.pdf
-*.png
-*.jpg
-*.jpeg
+# *.pdf
+# *.png
+# *.jpg
+# *.jpeg
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
