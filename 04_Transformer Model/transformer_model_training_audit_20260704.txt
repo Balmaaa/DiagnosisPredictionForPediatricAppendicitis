@@ -1,0 +1,245 @@
+================================================================================
+ADVANCED TRANSFORMER MODEL FOR PEDIATRIC APPENDICITIS PREDICTION
+With Feature-Specific Embeddings & Hyperparameter Tuning
+================================================================================
+Using device: cpu
+
+============================================================
+LOADING UNIFIED DATA
+[FAIR COMPARISON - UNIFIED 30 FEATURES]
+============================================================
+[FAIR COMPARISON]
+================================================================================
+
+Converting unified data to Transformer format...
+Train data shape: torch.Size([997, 42])
+Test data shape: torch.Size([312, 42])
+Numerical features: 42
+Categorical features: 32
+Feature info created with 74 features
+
+============================================================
+USING DEFAULT PARAMETERS FOR FAIR COMPARISON
+[Baseline models already have hyperparameter tuning]
+============================================================
+Class distribution - No Appendicitis: 592, Appendicitis: 405
+pos_weight for BCEWithLogitsLoss: 1.4617 (raw=1.4617)
+Model parameters: {'embed_dim': 128, 'num_heads': 8, 'num_layers': 6, 'dropout': 0.2}
+Training parameters: {'batch_size': 32, 'learning_rate': 0.0005, 'weight_decay': 0.001}
+
+============================================================
+INITIALIZING MODEL WITH BEST PARAMETERS
+============================================================
+Model initialized with parameters: {'embed_dim': 128, 'num_heads': 8, 'num_layers': 6, 'dropout': 0.2}
+Total parameters: 1,240,321
+[BCEWithLogitsLoss] pos_weight=1.4617
+
+Training advanced transformer model...
+  [DEBUG] Logits - min:-0.9552 max:-0.9037 mean:-0.9306 std:0.0098
+  [DEBUG] Probs  - min:0.2778 max:0.2883 mean:0.2828 std:0.0020
+Epoch 1/100:
+  Train Loss: 0.8634, Train Acc: 52.26%
+  Val Loss: 0.9423, Val Acc: 59.60%
+Epoch 2/100:
+  Train Loss: 0.8392, Train Acc: 54.26%
+  Val Loss: 0.7517, Val Acc: 58.00%
+Epoch 3/100:
+  Train Loss: 0.6005, Train Acc: 75.93%
+  Val Loss: 0.5126, Val Acc: 79.60%
+Epoch 4/100:
+  Train Loss: 0.4236, Train Acc: 86.36%
+  Val Loss: 0.2806, Val Acc: 90.40%
+Epoch 5/100:
+  Train Loss: 0.2822, Train Acc: 90.47%
+  Val Loss: 0.2108, Val Acc: 92.40%
+Epoch 6/100:
+  Train Loss: 0.2353, Train Acc: 94.38%
+  Val Loss: 0.2542, Val Acc: 92.80%
+Epoch 7/100:
+  Train Loss: 0.2029, Train Acc: 94.48%
+  Val Loss: 0.1226, Val Acc: 97.60%
+Epoch 8/100:
+  Train Loss: 0.1938, Train Acc: 94.18%
+  Val Loss: 0.1480, Val Acc: 96.40%
+Epoch 9/100:
+  Train Loss: 0.1857, Train Acc: 95.29%
+  Val Loss: 0.1601, Val Acc: 94.00%
+Epoch 10/100:
+  Train Loss: 0.1747, Train Acc: 95.29%
+  Val Loss: 0.1188, Val Acc: 97.20%
+  [DEBUG] Logits - min:-6.5416 max:5.1563 mean:-0.5154 std:4.7314
+  [DEBUG] Probs  - min:0.0014 max:0.9943 mean:0.4483 std:0.4628
+Epoch 11/100:
+  Train Loss: 0.2095, Train Acc: 94.68%
+  Val Loss: 0.1494, Val Acc: 96.00%
+Epoch 12/100:
+  Train Loss: 0.1623, Train Acc: 95.69%
+  Val Loss: 0.1391, Val Acc: 95.60%
+Epoch 13/100:
+  Train Loss: 0.1701, Train Acc: 95.09%
+  Val Loss: 0.1475, Val Acc: 95.20%
+Epoch 14/100:
+  Train Loss: 0.1655, Train Acc: 96.29%
+  Val Loss: 0.1181, Val Acc: 97.20%
+Epoch 15/100:
+  Train Loss: 0.1449, Train Acc: 96.79%
+  Val Loss: 0.1358, Val Acc: 96.40%
+Epoch 16/100:
+  Train Loss: 0.1163, Train Acc: 96.59%
+  Val Loss: 0.1021, Val Acc: 97.60%
+Epoch 17/100:
+  Train Loss: 0.1188, Train Acc: 97.49%
+  Val Loss: 0.1592, Val Acc: 96.00%
+Epoch 18/100:
+  Train Loss: 0.1196, Train Acc: 96.59%
+  Val Loss: 0.1557, Val Acc: 95.60%
+Epoch 19/100:
+  Train Loss: 0.1235, Train Acc: 97.19%
+  Val Loss: 0.1702, Val Acc: 96.00%
+Epoch 20/100:
+  Train Loss: 0.1088, Train Acc: 97.49%
+  Val Loss: 0.2413, Val Acc: 93.20%
+  [DEBUG] Logits - min:-9.3610 max:5.4977 mean:-2.3565 std:6.4737
+  [DEBUG] Probs  - min:0.0001 max:0.9959 mean:0.4195 std:0.4837
+Epoch 21/100:
+  Train Loss: 0.0845, Train Acc: 97.99%
+  Val Loss: 0.0985, Val Acc: 97.20%
+Epoch 22/100:
+  Train Loss: 0.1092, Train Acc: 97.99%
+  Val Loss: 0.1036, Val Acc: 97.20%
+Epoch 23/100:
+  Train Loss: 0.0880, Train Acc: 97.99%
+  Val Loss: 0.0867, Val Acc: 97.20%
+Epoch 24/100:
+  Train Loss: 0.0827, Train Acc: 98.29%
+  Val Loss: 0.0938, Val Acc: 98.40%
+Epoch 25/100:
+  Train Loss: 0.0798, Train Acc: 97.79%
+  Val Loss: 0.1257, Val Acc: 96.80%
+Epoch 26/100:
+  Train Loss: 0.0834, Train Acc: 98.19%
+  Val Loss: 0.0737, Val Acc: 98.00%
+Epoch 27/100:
+  Train Loss: 0.0603, Train Acc: 98.70%
+  Val Loss: 0.1355, Val Acc: 96.40%
+Epoch 28/100:
+  Train Loss: 0.1276, Train Acc: 96.99%
+  Val Loss: 0.0745, Val Acc: 97.60%
+Epoch 29/100:
+  Train Loss: 0.0802, Train Acc: 98.09%
+  Val Loss: 0.1080, Val Acc: 97.20%
+Epoch 30/100:
+  Train Loss: 0.0633, Train Acc: 98.40%
+  Val Loss: 0.0639, Val Acc: 98.80%
+  [DEBUG] Logits - min:-10.6726 max:5.9527 mean:-4.0147 std:7.3824
+  [DEBUG] Probs  - min:0.0000 max:0.9974 mean:0.3922 std:0.4812
+Epoch 31/100:
+  Train Loss: 0.0701, Train Acc: 98.40%
+  Val Loss: 0.1843, Val Acc: 97.20%
+Epoch 32/100:
+  Train Loss: 0.0991, Train Acc: 97.49%
+  Val Loss: 0.1483, Val Acc: 94.80%
+Epoch 33/100:
+  Train Loss: 0.0732, Train Acc: 98.60%
+  Val Loss: 0.0815, Val Acc: 98.00%
+Epoch 34/100:
+  Train Loss: 0.0825, Train Acc: 98.29%
+  Val Loss: 0.1369, Val Acc: 96.40%
+Epoch 35/100:
+  Train Loss: 0.0607, Train Acc: 98.60%
+  Val Loss: 0.0580, Val Acc: 98.40%
+Epoch 36/100:
+  Train Loss: 0.0759, Train Acc: 98.29%
+  Val Loss: 0.0848, Val Acc: 98.80%
+Epoch 37/100:
+  Train Loss: 0.0625, Train Acc: 98.50%
+  Val Loss: 0.0929, Val Acc: 98.00%
+Epoch 38/100:
+  Train Loss: 0.0567, Train Acc: 98.90%
+  Val Loss: 0.0774, Val Acc: 98.40%
+Epoch 39/100:
+  Train Loss: 0.0467, Train Acc: 98.90%
+  Val Loss: 0.1297, Val Acc: 96.80%
+Epoch 40/100:
+  Train Loss: 0.0318, Train Acc: 99.10%
+  Val Loss: 0.0957, Val Acc: 98.00%
+  [DEBUG] Logits - min:-11.7045 max:7.5798 mean:-3.2157 std:8.8240
+  [DEBUG] Probs  - min:0.0000 max:0.9995 mean:0.4289 std:0.4905
+Epoch 41/100:
+  Train Loss: 0.0364, Train Acc: 99.10%
+  Val Loss: 0.1426, Val Acc: 96.80%
+Epoch 42/100:
+  Train Loss: 0.0306, Train Acc: 99.30%
+  Val Loss: 0.1242, Val Acc: 96.80%
+Epoch 43/100:
+  Train Loss: 0.0568, Train Acc: 98.70%
+  Val Loss: 0.2223, Val Acc: 95.20%
+Epoch 44/100:
+  Train Loss: 0.0392, Train Acc: 98.50%
+  Val Loss: 0.1032, Val Acc: 98.00%
+Epoch 45/100:
+  Train Loss: 0.0281, Train Acc: 99.40%
+  Val Loss: 0.0849, Val Acc: 98.00%
+Epoch 46/100:
+  Train Loss: 0.0275, Train Acc: 99.40%
+  Val Loss: 0.0994, Val Acc: 98.00%
+Epoch 47/100:
+  Train Loss: 0.0136, Train Acc: 99.60%
+  Val Loss: 0.1886, Val Acc: 97.20%
+Epoch 48/100:
+  Train Loss: 0.0299, Train Acc: 99.50%
+  Val Loss: 0.1442, Val Acc: 97.60%
+Epoch 49/100:
+  Train Loss: 0.0628, Train Acc: 98.60%
+  Val Loss: 0.1704, Val Acc: 96.80%
+Epoch 50/100:
+  Train Loss: 0.0207, Train Acc: 99.30%
+  Val Loss: 0.0617, Val Acc: 99.20%
+Early stopping at epoch 50
+
+[CALIBRATION] Running temperature scaling...
+[CALIBRATION] Temperature scaled: 1.2200
+
+[FINAL EVALUATION]
+  [DEBUG] Logits - min:-9.7429 max:6.2214 mean:-2.5306 std:7.0919
+  [DEBUG] Probs  - min:0.0003 max:0.9939 mean:0.4263 std:0.4808
+
+================================================================================
+FINAL RESULTS
+================================================================================
+Test Accuracy: 96.79%
+Test Loss: 0.1519
+
+Medical Metrics:
+  Accuracy: 0.9679
+  Precision: 0.9398
+  Sensitivity (Recall): 0.9843
+  Specificity: 0.9568
+  PPV (Positive Predictive Value): 0.9398
+  NPV (Negative Predictive Value): 0.9888
+
+Confusion Matrix:
+  True Positives: 125
+  True Negatives: 177
+  False Positives: 8
+  False Negatives: 2
+
+Model Architecture:
+  Embedding Dimension: 128
+  Number of Heads: 4
+  Number of Layers: 6
+  Dropout: 0.2
+  Learning Rate: 0.0005
+
+Results saved to: advanced_transformer_results_20260704_062500.pkl
+GUI checkpoint saved to: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\Transformer.pt
+
+================================================================================
+ADVANCED TRANSFORMER MODEL TRAINING COMPLETED
+[OK] Feature-specific embeddings implemented
+[OK] Multi-feature sequence processing
+[OK] Model training completed
+[OK] Proper Transformer architecture
+[OK] BCEWithLogitsLoss with class weighting
+[OK] Temperature scaling calibrated
+================================================================================
