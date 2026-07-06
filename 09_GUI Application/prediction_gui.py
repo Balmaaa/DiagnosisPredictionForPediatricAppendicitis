@@ -372,7 +372,22 @@ class AppendicitisGUI:
     # =====================================================
 
     def clear_fields(self):
-        pass
+        for field, widget in self.entries.items():
+            if isinstance(widget, ctk.CTkEntry):
+                widget.delete(0, "end")
+            elif isinstance(widget, ctk.CTkComboBox):
+                values = widget.cget("values")
+                if len(values) > 0:
+                    widget.set(values[0])
+                else:
+                    widget.set("")
+
+        self.result_label.configure(text="Diagnosis will appear here", text_color="white")
+        self.probability_label.configure(text="Appendicitis Probability:")
+        self.threshold_label.configure(text="Decision Threshold:")
+        self.model_used_label.configure(text="Model Used:")
+        self.lab_status_label.configure(text="Laboratory Status:")
+
 
     def run(self):
         self.root.mainloop()
