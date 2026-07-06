@@ -328,7 +328,7 @@ class AppendicitisGUI:
             model_name = self.model_var.get()
 
             if model_name == "": messagebox.showwarning("Model Required", "Please select a prediction model.")
-                return
+            return
 
             patient = self.collect_inputs()
             result = self.backend.predict(model_name=model_name, input_data=patient)
