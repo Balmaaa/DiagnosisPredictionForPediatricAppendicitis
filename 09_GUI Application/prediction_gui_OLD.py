@@ -76,8 +76,15 @@ class AppendicitisGUI:
         self.threshold_var = tk.StringVar(value="-")
 
         # Main Container
-        self.main_frame = tk.Frame(self.root, bg=self.COLOR_BACKGROUND)
-        self.main_frame.pack(fill="both", expand=True, padx=15, pady=15)
+        self.canvas = tk.Canvas(self.root, bg=self.COLOR_BACKGROUND, highlightthickness=0)
+        self.scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.main_frame = tk.Frame(self.canvas, bg=self.COLOR_BACKGROUND)
+        self.main_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.main_frame, anchor="nw")
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
         # Build GUI
         self.create_title()
@@ -87,6 +94,13 @@ class AppendicitisGUI:
         self.create_model_frame()
         self.create_result_frame()
         self.create_buttons()
+
+    def resize_canvas(event):
+        self.canvas.itemconfig( self.canvas_window, width=event.width )
+        self.canvas.bind("<Configure>", resize_canvas)
+
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
     # =====================================================
@@ -278,7 +292,12 @@ class AppendicitisGUI:
         # =====================================================
 
         patient["Age"] = (None if self.age_var.get().strip() == "" else float(self.age_var.get()))
+        if patient["Age"] is None:
+            raise ValueError("Age is required.")
+
         patient["Sex"] = self.sex_var.get()
+        if patient["Sex"] == "":
+            raise ValueError("Sex is required.")
 
         # =====================================================
         # PHYSICAL
@@ -327,8 +346,9 @@ class AppendicitisGUI:
         try:
             model_name = self.model_var.get()
 
-            if model_name == "": messagebox.showwarning("Model Required", "Please select a prediction model.")
-            return
+            if model_name == "":
+                messagebox.showwarning("Model Required", "Please select a prediction model.")
+                return
 
             patient = self.collect_inputs()
             result = self.backend.predict(model_name=model_name, input_data=patient)
@@ -348,23 +368,22 @@ class AppendicitisGUI:
         diagnosis = result["diagnosis"]
         probability = result["prob_appendicitis"] * 100
         threshold = result["threshold"] * 100
-        model = result["model"]
         missing_labs = result["missing_laboratory_fields"]
 
         if diagnosis == "Appendicitis":
-            self.result_label.configure(text="APPENDICITIS DETECTED", text_color="red")
+            self.result_var.set("APPENDICITIS DETECTED")
+            self.result_label.config(fg="red")
         else:
-            self.result_label.configure(text="NO APPENDICITIS DETECTED", text_color="green")
+            self.result_var.set("NO APPENDICITIS DETECTED")
+            self.result_label.config(fg="green")
 
-        self.probability_label.configure(text=f"Appendicitis Probability: {probability:.2f}%")
-        self.threshold_label.configure(text=f"Decision Threshold: {threshold:.0f}%")
-        self.model_used_label.configure(text=f"Model Used: {model}")
+        self.probability_var.set(f"{probability:.2f}%")
+        self.threshold_var.set(f"{threshold:.0f}%")
 
-        if len(missing_labs) == 0:
-            self.lab_status_label.configure(text="Laboratory Data: Complete", text_color="green")
+        if missing_labs:
+            self.missing_lab_var.set(", ".join(missing_labs))
         else:
-            missing = ", ".join(missing_labs)
-            self.lab_status_label.configure(text=f"Missing Laboratory Fields:\n{missing}", text_color="orange")
+            self.missing_lab_var.set("None")
 
 
     # =====================================================
@@ -372,21 +391,38 @@ class AppendicitisGUI:
     # =====================================================
 
     def clear_fields(self):
-        for field, widget in self.entries.items():
-            if isinstance(widget, ctk.CTkEntry):
-                widget.delete(0, "end")
-            elif isinstance(widget, ctk.CTkComboBox):
-                values = widget.cget("values")
-                if len(values) > 0:
-                    widget.set(values[0])
-                else:
-                    widget.set("")
+        self.age_var.set("")
+        self.sex_var.set("")
+        self.weight_var.set("")
+        self.height_var.set("")
+        self.bmi_var.set("")
 
-        self.result_label.configure(text="Diagnosis will appear here", text_color="white")
-        self.probability_label.configure(text="Appendicitis Probability:")
-        self.threshold_label.configure(text="Decision Threshold:")
-        self.model_used_label.configure(text="Model Used:")
-        self.lab_status_label.configure(text="Laboratory Status:")
+        self.body_temperature_var.set("")
+        self.abdominal_pain_var.set("")
+        self.migratory_pain_var.set("")
+        self.nausea_var.set("")
+        self.vomiting_var.set("")
+        self.anorexia_var.set("")
+        self.diarrhea_var.set("")
+        self.constipation_var.set("")
+        self.rebound_tenderness_var.set("")
+        self.guarding_var.set("")
+
+        self.wbc_var.set("")
+        self.rbc_var.set("")
+        self.hemoglobin_var.set("")
+        self.rdw_var.set("")
+        self.segmented_neutrophils_var.set("")
+        self.thrombocyte_var.set("")
+        self.crp_var.set("")
+        self.neutrophil_percentage_var.set("")
+
+        self.result_var.set("Waiting for prediction...")
+        self.probability_var.set("-")
+        self.threshold_var.set("-")
+        self.missing_lab_var.set("-")
+
+        self.result_label.config(fg=self.COLOR_PRIMARY)
 
 
     def run(self):
