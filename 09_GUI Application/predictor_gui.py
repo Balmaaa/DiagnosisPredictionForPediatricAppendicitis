@@ -61,6 +61,45 @@ class AppendicitisGUI:
         else:
             self.model_var.set("")
 
+        # =====================================================
+        # VITAL SIGNS
+        # =====================================================
+
+        self.body_temperature_var = tk.StringVar()
+
+        # =====================================================
+        # CLINICAL SYMPTOMS
+        # =====================================================
+        self.migratory_pain_var = tk.StringVar()
+        self.lower_right_abd_pain_var = tk.StringVar()
+        self.contralateral_rebound_tenderness_var = tk.StringVar()
+        self.coughing_pain_var = tk.StringVar()
+        self.nausea_var = tk.StringVar()
+        self.loss_of_appetite_var = tk.StringVar()
+        self.dysuria_var = tk.StringVar()
+        self.stool_var = tk.StringVar()
+        self.peritonitis_var = tk.StringVar()
+        self.psoas_sign_var = tk.StringVar()
+        self.ipsilateral_rebound_tenderness_var = tk.StringVar()
+
+        # =====================================================
+        # LABORATORY VARIABLES
+        # =====================================================
+
+        self.appendix_diameter_var = tk.StringVar()
+        self.wbc_count_var = tk.StringVar()
+        self.crp_var = tk.StringVar()
+        self.neutrophil_percentage_var = tk.StringVar()
+        self.segmented_neutrophils_var = tk.StringVar()
+        self.neutrophilia_var = tk.StringVar()
+        self.rbc_count_var = tk.StringVar()
+        self.hemoglobin_var = tk.StringVar()
+        self.rdw_var = tk.StringVar()
+        self.thrombocyte_count_var = tk.StringVar()
+        self.ketones_in_urine_var = tk.StringVar()
+        self.rbc_in_urine_var = tk.StringVar()
+        self.wbc_in_urine_var = tk.StringVar()
+
     
     def create_scrollable_container(self):
         self.canvas = tk.Canvas(self.root, bg=self.COLOR_BACKGROUND, highlightthickness=0)
