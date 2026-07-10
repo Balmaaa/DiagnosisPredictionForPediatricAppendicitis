@@ -39,10 +39,18 @@ class UltrasoundFrame:
         create_label(self.frame, "Surrounding Tissue Reaction", 4, 0)
         create_combobox(self.frame, self.app.surrounding_tissue_reaction_var, self.yes_no, 4, 1)
 
-    # =====================================================
-    # GRID CONFIGURATION
-    # =====================================================
 
     def configure_grid(self):
         for column in range(4):
             self.frame.grid_columnconfigure(column, weight=1)
+
+
+    def clear(self):
+        self.appendix_on_us_var.set("")
+        self.target_sign_var.set("")
+        self.appendicolith_var.set("")
+        self.perfusion_var.set("")
+        self.perforation_var.set("")
+        self.surrounding_tissue_reaction_var.set("")
+        self.free_fluids_var.set("")
+        self.appendix_location_var.set("")

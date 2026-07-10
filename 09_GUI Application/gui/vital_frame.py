@@ -23,3 +23,7 @@ class VitalFrame:
     def configure_grid(self):
         for column in range(2):
             self.frame.grid_columnconfigure(column, weight=1)
+
+    
+    def clear(self):
+        self.body_temperature_var.set("")

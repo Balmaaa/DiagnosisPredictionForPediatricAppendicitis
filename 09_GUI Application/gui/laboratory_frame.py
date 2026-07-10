@@ -58,3 +58,19 @@ class LaboratoryFrame:
     def configure_grid(self):
         for column in range(6):
             self.frame.grid_columnconfigure(column, weight=1)
+
+    
+    def clear(self):
+        self.appendix_diameter_var.set("")
+        self.wbc_count_var.set("")
+        self.crp_var.set("")
+        self.neutrophil_percentage_var.set("")
+        self.segmented_neutrophils_var.set("")
+        self.neutrophilia_var.set("")
+        self.rbc_count_var.set("")
+        self.hemoglobin_var.set("")
+        self.rdw_var.set("")
+        self.thrombocyte_count_var.set("")
+        self.ketones_in_urine_var.set("")
+        self.rbc_in_urine_var.set("")
+        self.wbc_in_urine_var.set("")

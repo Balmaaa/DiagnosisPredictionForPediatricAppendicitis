@@ -32,3 +32,11 @@ class PatientFrame:
     def configure_grid(self):
         for column in range(6):
             self.frame.grid_columnconfigure(column, weight=1)
+
+
+    def clear(self):
+        self.age_var.set("")
+        self.sex_var.set("")
+        self.weight_var.set("")
+        self.height_var.set("")
+        self.bmi_var.set("")

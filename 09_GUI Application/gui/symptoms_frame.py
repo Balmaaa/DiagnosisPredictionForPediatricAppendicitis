@@ -44,3 +44,17 @@ class SymptomsFrame:
     def configure_grid(self):
         for column in range(4):
             self.frame.grid_columnconfigure(column, weight=1)
+
+
+    def clear(self):
+        self.migratory_pain_var.set("")
+        self.lower_right_abd_pain_var.set("")
+        self.contralateral_rebound_tenderness_var.set("")
+        self.coughing_pain_var.set("")
+        self.nausea_var.set("")
+        self.loss_of_appetite_var.set("")
+        self.dysuria_var.set("")
+        self.stool_var.set("")
+        self.peritonitis_var.set("")
+        self.psoas_sign_var.set("")
+        self.ipsilateral_rebound_tenderness_var.set("")

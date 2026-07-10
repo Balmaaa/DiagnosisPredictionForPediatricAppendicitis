@@ -42,10 +42,19 @@ class ComplicationsFrame:
         create_combobox(self.frame, self.app.enteritis_var, self.yes_no, 4, 3)
 
 
-    # =====================================================
-    # GRID CONFIGURATION
-    # =====================================================
-
     def configure_grid(self):
         for column in range(4):
-            self.frame.grid_columnconfigure( column, weight=1 )
+            self.frame.grid_columnconfigure(column, weight=1)
+
+
+    def clear(self):
+        self.appendicular_abscess_var.set("")
+        self.abscess_location_var.set("")
+        self.pathological_lymph_nodes_var.set("")
+        self.lymph_nodes_location_var.set("")
+        self.bowel_wall_thickening_var.set("")
+        self.conglomerate_of_bowel_loops_var.set("")
+        self.ileus_var.set("")
+        self.coprostasis_var.set("")
+        self.meteorism_var.set("")
+        self.enteritis_var.set("")
