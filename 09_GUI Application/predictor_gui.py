@@ -7,6 +7,7 @@ from gui.vital_frame import VitalFrame
 from gui.symptoms_frame import SymptomsFrame
 from gui.laboratory_frame import LaboratoryFrame
 from gui.ultrasound_frame import UltrasoundFrame
+from gui.complications_frame import ComplicationsFrame
 from gui.result_frame import ResultFrame
 from gui.widgets import *
 
@@ -100,6 +101,22 @@ class AppendicitisGUI:
         self.rbc_in_urine_var = tk.StringVar()
         self.wbc_in_urine_var = tk.StringVar()
 
+
+        # =====================================================
+        # ULTRASOUND COMPLICATIONS
+        # =====================================================
+
+        self.appendicular_abscess_var = tk.StringVar()
+        self.abscess_location_var = tk.StringVar()
+        self.pathological_lymph_nodes_var = tk.StringVar()
+        self.lymph_nodes_location_var = tk.StringVar()
+        self.bowel_wall_thickening_var = tk.StringVar()
+        self.conglomerate_of_bowel_loops_var = tk.StringVar()
+        self.ileus_var = tk.StringVar()
+        self.coprostasis_var = tk.StringVar()
+        self.meteorism_var = tk.StringVar()
+        self.enteritis_var = tk.StringVar()
+
     
     def create_scrollable_container(self):
         self.canvas = tk.Canvas(self.root, bg=self.COLOR_BACKGROUND, highlightthickness=0)
@@ -150,6 +167,8 @@ class AppendicitisGUI:
         self.laboratory_frame.build()
         self.ultrasound_frame = UltrasoundFrame(parent=self.main_frame, app=self)
         self.ultrasound_frame.build()
+        self.complications_frame = ComplicationsFrame(parent=self.main_frame, app=self)
+        self.complications_frame.build()
         self.result_frame = ResultFrame(parent=self.main_frame, app=self)
         self.result_frame.build()
         self.create_buttons()
@@ -203,7 +222,142 @@ class AppendicitisGUI:
         )
         self.exit_button.pack(side="right", padx=5)
 
-        
+
+    def collect_inputs(self):
+        patient = {}
+
+        # =====================================================
+        # PATIENT INFORMATION
+        # =====================================================
+
+        patient["Age"] = (None if self.patient_frame.age_var.get().strip() == "" else float(self.patient_frame.age_var.get()))
+
+        if patient["Age"] is None:
+            raise ValueError("Age is required.")
+
+        patient["Sex"] = self.patient_frame.sex_var.get()
+
+        if patient["Sex"] == "":
+            raise ValueError("Sex is required.")
+
+        patient["Weight"] = (None if self.patient_frame.weight_var.get().strip() == "" else float(self.patient_frame.weight_var.get()))
+        patient["Height"] = (None if self.patient_frame.height_var.get().strip() == "" else float(self.patient_frame.height_var.get()))
+        patient["BMI"] = (None if self.patient_frame.bmi_var.get().strip() == "" else float(self.patient_frame.bmi_var.get()))
+
+        # =====================================================
+        # VITAL SIGNS
+        # =====================================================
+
+        patient["Body_Temperature"] = (None if self.vital_frame.body_temperature_var.get().strip() == "" else float(self.vital_frame.body_temperature_var.get()))
+
+        # =====================================================
+        # CLINICAL SYMPTOMS
+        # =====================================================
+
+        patient["Migratory_Pain"] = self.symptoms_frame.migratory_pain_var.get()
+        patient["Lower_Right_Abd_Pain"] = (self.symptoms_frame.lower_right_abd_pain_var.get() )
+        patient["Contralateral_Rebound_Tenderness"] = (self.symptoms_frame.contralateral_rebound_tenderness_var.get())
+        patient["Coughing_Pain"] = (self.symptoms_frame.coughing_pain_var.get())
+        patient["Nausea"] = (self.symptoms_frame.nausea_var.get())
+        patient["Loss_of_Appetite"] = (self.symptoms_frame.loss_of_appetite_var.get())
+        patient["Dysuria"] = (self.symptoms_frame.dysuria_var.get())
+        patient["Stool"] = (self.symptoms_frame.stool_var.get())
+        patient["Peritonitis"] = (self.symptoms_frame.peritonitis_var.get())
+        patient["Psoas_Sign"] = (self.symptoms_frame.psoas_sign_var.get())
+        patient["Ipsilateral_Rebound_Tenderness"] = ( self.symptoms_frame.ipsilateral_rebound_tenderness_var.get())
+
+        # =====================================================
+        # LABORATORY
+        # =====================================================
+
+        patient["Appendix_Diameter"] = (None if self.laboratory_frame.appendix_diameter_var.get().strip() == "" else float(self.laboratory_frame.appendix_diameter_var.get()))
+        patient["WBC_Count"] = (None if self.laboratory_frame.wbc_count_var.get().strip() == "" else float(self.laboratory_frame.wbc_count_var.get()))
+        patient["CRP"] = (None if self.laboratory_frame.crp_var.get().strip() == "" else float(self.laboratory_frame.crp_var.get()))
+        patient["Neutrophil_Percentage"] = (None if self.laboratory_frame.neutrophil_percentage_var.get().strip() == "" else float(self.laboratory_frame.neutrophil_percentage_var.get()))
+        patient["Segmented_Neutrophils"] = (None if self.laboratory_frame.segmented_neutrophils_var.get().strip() == "" else float(self.laboratory_frame.segmented_neutrophils_var.get()))
+        patient["Neutrophilia"] = (self.laboratory_frame.neutrophilia_var.get())
+        patient["RBC_Count"] = (None if self.laboratory_frame.rbc_count_var.get().strip() == "" else float(self.laboratory_frame.rbc_count_var.get()))
+        patient["Hemoglobin"] = (None if self.laboratory_frame.hemoglobin_var.get().strip() == "" else float(self.laboratory_frame.hemoglobin_var.get()))
+        patient["RDW"] = (None if self.laboratory_frame.rdw_var.get().strip() == "" else float(self.laboratory_frame.rdw_var.get()))
+        patient["Thrombocyte_Count"] = (None if self.laboratory_frame.thrombocyte_count_var.get().strip() == "" else float(self.laboratory_frame.thrombocyte_count_var.get()))
+        patient["Ketones_in_Urine"] = (self.laboratory_frame.ketones_in_urine_var.get())
+        patient["RBC_in_Urine"] = (self.laboratory_frame.rbc_in_urine_var.get())
+        patient["WBC_in_Urine"] = (self.laboratory_frame.wbc_in_urine_var.get())
+
+        # =====================================================
+        # ULTRASOUND
+        # =====================================================
+
+        patient["Appendix_on_US"] = (self.ultrasound_frame.appendix_on_us_var.get())
+        patient["Target_Sign"] = (self.ultrasound_frame.target_sign_var.get())
+        patient["Appendicolith"] = (self.ultrasound_frame.appendicolith_var.get())
+        patient["Perfusion"] = (self.ultrasound_frame.perfusion_var.get())
+        patient["Perforation"] = (self.ultrasound_frame.perforation_var.get())
+        patient["Surrounding_Tissue_Reaction"] = (self.ultrasound_frame.surrounding_tissue_reaction_var.get())
+        patient["Free_Fluids"] = (self.ultrasound_frame.free_fluids_var.get())
+        patient["Appendix_Location"] = (self.ultrasound_frame.appendix_location_var.get())
+
+        # =====================================================
+        # ULTRASOUND COMPLICATIONS
+        # =====================================================
+
+        patient["Appendicular_Abscess"] = (self.complications_frame.appendicular_abscess_var.get())
+        patient["Abscess_Location"] = (self.complications_frame.abscess_location_var.get())
+        patient["Pathological_Lymph_Nodes"] = (self.complications_frame.pathological_lymph_nodes_var.get())
+        patient["Lymph_Nodes_Location"] = (self.complications_frame.lymph_nodes_location_var.get())
+        patient["Bowel_Wall_Thickening"] = (self.complications_frame.bowel_wall_thickening_var.get())
+        patient["Conglomerate_of_Bowel_Loops"] = (self.complications_frame.conglomerate_of_bowel_loops_var.get())
+        patient["Ileus"] = (self.complications_frame.ileus_var.get())
+        patient["Coprostasis"] = (self.complications_frame.coprostasis_var.get())
+        patient["Meteorism"] = (self.complications_frame.meteorism_var.get())
+        patient["Enteritis"] = (self.complications_frame.enteritis_var.get())
+
+        return patient
+
+
+    # =====================================================
+    # PREDICTION
+    # =====================================================
+
+    def predict(self):
+        try:
+            model_name = self.model_var.get()
+            if model_name == "":
+                messagebox.showwarning("Model Required", "Please select a prediction model.")
+                return
+
+            patient = self.collect_inputs()
+            result = self.backend.predict(model_name=model_name, input_data=patient)
+            self.display_result(result)
+
+        except ValueError as e:
+            messagebox.showerror("Input Error", str(e))
+        except Exception as e:
+            messagebox.showerror("Prediction Error", f"An unexpected error occurred.\n\n{e}")
+
+
+    # =====================================================
+    # DISPLAY RESULT
+    # =====================================================
+
+    def display_result(self, result):
+        self.result_frame.update_results(result)
+
+
+    # =====================================================
+    # CLEAR ALL INPUTS
+    # =====================================================
+
+    def clear_fields(self):
+        self.patient_frame.clear()
+        self.vital_frame.clear()
+        self.symptoms_frame.clear()
+        self.laboratory_frame.clear()
+        self.ultrasound_frame.clear()
+        self.complications_frame.clear()
+        self.result_frame.clear()
+
+
     def run(self):
         self.root.mainloop()
 
