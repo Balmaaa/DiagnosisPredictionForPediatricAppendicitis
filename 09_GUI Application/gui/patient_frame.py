@@ -19,7 +19,7 @@ class PatientFrame:
         create_label(self.frame, "Age", 0, 0)
         create_entry(self.frame, self.app.age_var, 0, 1)
         create_label(self.frame, "Sex", 0, 2)
-        create_combobox(self.frame, self.app.sex_var, ["Male", "Female"], 0, 3)
+        create_combobox(self.frame, self.app.sex_var, ["", "male", "female"], 0, 3)
         create_label(self.frame, "Weight (kg)", 0, 4)
         create_entry(self.frame, self.app.weight_var, 0, 5)
 
@@ -35,8 +35,8 @@ class PatientFrame:
 
 
     def clear(self):
-        self.age_var.set("")
-        self.sex_var.set("")
-        self.weight_var.set("")
-        self.height_var.set("")
-        self.bmi_var.set("")
+        self.app.age_var.set("")
+        self.app.sex_var.set("")
+        self.app.weight_var.set("")
+        self.app.height_var.set("")
+        self.app.bmi_var.set("")

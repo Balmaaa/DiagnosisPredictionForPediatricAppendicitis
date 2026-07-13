@@ -1,4 +1,4 @@
-from gui.widgets import (create_section_frame, create_label, create_entry)
+from gui.widgets import (create_section_frame, create_label, create_entry, create_combobox)
 
 
 class LaboratoryFrame:
@@ -31,7 +31,7 @@ class LaboratoryFrame:
         create_entry(self.frame, self.app.segmented_neutrophils_var, 1, 3)
 
         create_label(self.frame, "Neutrophilia", 1, 4)
-        create_entry(self.frame, self.app.neutrophilia_var, 1, 5)
+        create_combobox(self.frame, self.app.neutrophilia_var, ["", "Yes", "No"], 1, 5)
 
         create_label(self.frame, "RBC Count", 2, 0)
         create_entry(self.frame, self.app.rbc_count_var, 2, 1)
@@ -46,13 +46,13 @@ class LaboratoryFrame:
         create_entry(self.frame, self.app.thrombocyte_count_var, 3, 1)
 
         create_label(self.frame, "Ketones in Urine", 3, 2)
-        create_entry(self.frame, self.app.ketones_in_urine_var, 3, 3)
+        create_combobox(self.frame, self.app.ketones_in_urine_var, ["", "+", "++", "+++"], 3, 3)
 
         create_label(self.frame, "RBC in Urine", 3, 4)
-        create_entry(self.frame, self.app.rbc_in_urine_var, 3, 5)
+        create_combobox(self.frame, self.app.rbc_in_urine_var, ["", "+", "++", "+++"], 3, 5)
 
         create_label(self.frame, "WBC in Urine", 4, 0)
-        create_entry(self.frame, self.app.wbc_in_urine_var, 4, 1)
+        create_combobox(self.frame, self.app.wbc_in_urine_var, ["", "Yes", "No"], 4, 1)
 
 
     def configure_grid(self):
@@ -61,16 +61,16 @@ class LaboratoryFrame:
 
     
     def clear(self):
-        self.appendix_diameter_var.set("")
-        self.wbc_count_var.set("")
-        self.crp_var.set("")
-        self.neutrophil_percentage_var.set("")
-        self.segmented_neutrophils_var.set("")
-        self.neutrophilia_var.set("")
-        self.rbc_count_var.set("")
-        self.hemoglobin_var.set("")
-        self.rdw_var.set("")
-        self.thrombocyte_count_var.set("")
-        self.ketones_in_urine_var.set("")
-        self.rbc_in_urine_var.set("")
-        self.wbc_in_urine_var.set("")
+        self.app.appendix_diameter_var.set("")
+        self.app.wbc_count_var.set("")
+        self.app.crp_var.set("")
+        self.app.neutrophil_percentage_var.set("")
+        self.app.segmented_neutrophils_var.set("")
+        self.app.neutrophilia_var.set("")
+        self.app.rbc_count_var.set("")
+        self.app.hemoglobin_var.set("")
+        self.app.rdw_var.set("")
+        self.app.thrombocyte_count_var.set("")
+        self.app.ketones_in_urine_var.set("")
+        self.app.rbc_in_urine_var.set("")
+        self.app.wbc_in_urine_var.set("")

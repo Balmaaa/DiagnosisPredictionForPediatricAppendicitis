@@ -48,13 +48,13 @@ class ComplicationsFrame:
 
 
     def clear(self):
-        self.appendicular_abscess_var.set("")
-        self.abscess_location_var.set("")
-        self.pathological_lymph_nodes_var.set("")
-        self.lymph_nodes_location_var.set("")
-        self.bowel_wall_thickening_var.set("")
-        self.conglomerate_of_bowel_loops_var.set("")
-        self.ileus_var.set("")
-        self.coprostasis_var.set("")
-        self.meteorism_var.set("")
-        self.enteritis_var.set("")
+        self.app.appendicular_abscess_var.set("")
+        self.app.abscess_location_var.set("")
+        self.app.pathological_lymph_nodes_var.set("")
+        self.app.lymph_nodes_location_var.set("")
+        self.app.bowel_wall_thickening_var.set("")
+        self.app.conglomerate_of_bowel_loops_var.set("")
+        self.app.ileus_var.set("")
+        self.app.coprostasis_var.set("")
+        self.app.meteorism_var.set("")
+        self.app.enteritis_var.set("")

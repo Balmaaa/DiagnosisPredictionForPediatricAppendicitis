@@ -63,6 +63,16 @@ class AppendicitisGUI:
             self.model_var.set("")
 
         # =====================================================
+        # PATIENT INFORMATION
+        # =====================================================
+
+        self.age_var = tk.StringVar()
+        self.sex_var = tk.StringVar()
+        self.weight_var = tk.StringVar()
+        self.height_var = tk.StringVar()
+        self.bmi_var = tk.StringVar()
+
+        # =====================================================
         # VITAL SIGNS
         # =====================================================
 
@@ -101,6 +111,18 @@ class AppendicitisGUI:
         self.rbc_in_urine_var = tk.StringVar()
         self.wbc_in_urine_var = tk.StringVar()
 
+        # =====================================================
+        # ULTRASOUND VARIABLES
+        # =====================================================
+
+        self.appendix_on_us_var = tk.StringVar()
+        self.free_fluids_var = tk.StringVar()
+        self.appendix_wall_layers_var = tk.StringVar()
+        self.target_sign_var = tk.StringVar()
+        self.appendicolith_var = tk.StringVar()
+        self.perfusion_var = tk.StringVar()
+        self.perforation_var = tk.StringVar()
+        self.surrounding_tissue_reaction_var = tk.StringVar()
 
         # =====================================================
         # ULTRASOUND COMPLICATIONS
@@ -230,19 +252,19 @@ class AppendicitisGUI:
         # PATIENT INFORMATION
         # =====================================================
 
-        patient["Age"] = (None if self.patient_frame.age_var.get().strip() == "" else float(self.patient_frame.age_var.get()))
+        patient["Age"] = (None if self.age_var.get().strip() == "" else float(self.age_var.get()))
 
         if patient["Age"] is None:
             raise ValueError("Age is required.")
 
-        patient["Sex"] = self.patient_frame.sex_var.get()
+        patient["Sex"] = self.sex_var.get()
 
         if patient["Sex"] == "":
             raise ValueError("Sex is required.")
 
-        patient["Weight"] = (None if self.patient_frame.weight_var.get().strip() == "" else float(self.patient_frame.weight_var.get()))
-        patient["Height"] = (None if self.patient_frame.height_var.get().strip() == "" else float(self.patient_frame.height_var.get()))
-        patient["BMI"] = (None if self.patient_frame.bmi_var.get().strip() == "" else float(self.patient_frame.bmi_var.get()))
+        patient["Weight"] = (None if self.weight_var.get().strip() == "" else float(self.weight_var.get()))
+        patient["Height"] = (None if self.height_var.get().strip() == "" else float(self.height_var.get()))
+        patient["BMI"] = (None if self.bmi_var.get().strip() == "" else float(self.bmi_var.get()))
 
         # =====================================================
         # VITAL SIGNS
@@ -288,14 +310,13 @@ class AppendicitisGUI:
         # ULTRASOUND
         # =====================================================
 
-        patient["Appendix_on_US"] = (self.ultrasound_frame.appendix_on_us_var.get())
-        patient["Target_Sign"] = (self.ultrasound_frame.target_sign_var.get())
-        patient["Appendicolith"] = (self.ultrasound_frame.appendicolith_var.get())
-        patient["Perfusion"] = (self.ultrasound_frame.perfusion_var.get())
-        patient["Perforation"] = (self.ultrasound_frame.perforation_var.get())
-        patient["Surrounding_Tissue_Reaction"] = (self.ultrasound_frame.surrounding_tissue_reaction_var.get())
-        patient["Free_Fluids"] = (self.ultrasound_frame.free_fluids_var.get())
-        patient["Appendix_Location"] = (self.ultrasound_frame.appendix_location_var.get())
+        patient["Appendix_on_US"] = self.appendix_on_us_var.get()
+        patient["Target_Sign"] = self.target_sign_var.get()
+        patient["Appendicolith"] = self.appendicolith_var.get()
+        patient["Perfusion"] = self.perfusion_var.get()
+        patient["Perforation"] = self.perforation_var.get()
+        patient["Surrounding_Tissue_Reaction"] = self.surrounding_tissue_reaction_var.get()
+        patient["Free_Fluids"] = self.free_fluids_var.get()
 
         # =====================================================
         # ULTRASOUND COMPLICATIONS

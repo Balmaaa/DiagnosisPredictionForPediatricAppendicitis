@@ -53,9 +53,6 @@ class ResultFrame:
         else:
             self.missing_label.config(text="Missing Laboratory Fields :\n" + "\n".join(missing))
 
-    # =====================================================
-    # CLEAR
-    # =====================================================
 
     def clear(self):
         self.model_label.config(text="Model : -")

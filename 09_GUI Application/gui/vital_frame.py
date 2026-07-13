@@ -3,7 +3,6 @@ from gui.widgets import (create_section_frame, create_label, create_entry)
 
 class VitalFrame:
     def __init__(self, parent, app):
-
         self.parent = parent
         self.app = app
         self.frame = None
@@ -26,4 +25,4 @@ class VitalFrame:
 
     
     def clear(self):
-        self.body_temperature_var.set("")
+        self.app.body_temperature_var.set("")
