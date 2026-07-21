@@ -55,12 +55,6 @@ class AppendicitisGUI:
 
     
     def initialize_variables(self):
-        self.model_var = tk.StringVar()
-        available_models = self.backend.get_available_models()
-        if available_models:
-            self.model_var.set(available_models[0])
-        else:
-            self.model_var.set("")
 
         # =====================================================
         # PATIENT INFORMATION
@@ -244,7 +238,6 @@ class AppendicitisGUI:
         )
         self.exit_button.pack(side="right", padx=5)
 
-
     def collect_inputs(self):
         patient = {}
 
@@ -252,7 +245,7 @@ class AppendicitisGUI:
         # PATIENT INFORMATION
         # =====================================================
 
-        patient["Age"] = (None if self.age_var.get().strip() == "" else float(self.age_var.get()))
+        patient["Age"] = None if self.age_var.get().strip() == "" else float(self.age_var.get())
 
         if patient["Age"] is None:
             raise ValueError("Age is required.")
@@ -262,79 +255,79 @@ class AppendicitisGUI:
         if patient["Sex"] == "":
             raise ValueError("Sex is required.")
 
-        patient["Weight"] = (None if self.weight_var.get().strip() == "" else float(self.weight_var.get()))
-        patient["Height"] = (None if self.height_var.get().strip() == "" else float(self.height_var.get()))
-        patient["BMI"] = (None if self.bmi_var.get().strip() == "" else float(self.bmi_var.get()))
+        patient["Weight"] = None if self.weight_var.get().strip() == "" else float(self.weight_var.get())
+        patient["Height"] = None if self.height_var.get().strip() == "" else float(self.height_var.get())
+        patient["BMI"] = None if self.bmi_var.get().strip() == "" else float(self.bmi_var.get())
 
         # =====================================================
         # VITAL SIGNS
         # =====================================================
 
-        patient["Body_Temperature"] = (None if self.vital_frame.body_temperature_var.get().strip() == "" else float(self.vital_frame.body_temperature_var.get()))
+        patient["Body_Temperature"] = (None if self.body_temperature_var.get().strip() == "" else float(self.body_temperature_var.get()))
 
         # =====================================================
         # CLINICAL SYMPTOMS
         # =====================================================
 
-        patient["Migratory_Pain"] = self.symptoms_frame.migratory_pain_var.get()
-        patient["Lower_Right_Abd_Pain"] = (self.symptoms_frame.lower_right_abd_pain_var.get() )
-        patient["Contralateral_Rebound_Tenderness"] = (self.symptoms_frame.contralateral_rebound_tenderness_var.get())
-        patient["Coughing_Pain"] = (self.symptoms_frame.coughing_pain_var.get())
-        patient["Nausea"] = (self.symptoms_frame.nausea_var.get())
-        patient["Loss_of_Appetite"] = (self.symptoms_frame.loss_of_appetite_var.get())
-        patient["Dysuria"] = (self.symptoms_frame.dysuria_var.get())
-        patient["Stool"] = (self.symptoms_frame.stool_var.get())
-        patient["Peritonitis"] = (self.symptoms_frame.peritonitis_var.get())
-        patient["Psoas_Sign"] = (self.symptoms_frame.psoas_sign_var.get())
-        patient["Ipsilateral_Rebound_Tenderness"] = ( self.symptoms_frame.ipsilateral_rebound_tenderness_var.get())
+        patient["Migratory_Pain"] = self.migratory_pain_var.get()
+        patient["Lower_Right_Abd_Pain"] = self.lower_right_abd_pain_var.get()
+        patient["Contralateral_Rebound_Tenderness"] = self.contralateral_rebound_tenderness_var.get()
+        patient["Coughing_Pain"] = self.coughing_pain_var.get()
+        patient["Nausea"] = self.nausea_var.get()
+        patient["Loss_of_Appetite"] = self.loss_of_appetite_var.get()
+        patient["Dysuria"] = self.dysuria_var.get()
+        patient["Stool"] = self.stool_var.get()
+        patient["Peritonitis"] = self.peritonitis_var.get()
+        patient["Psoas_Sign"] = self.psoas_sign_var.get()
+        patient["Ipsilateral_Rebound_Tenderness"] = self.ipsilateral_rebound_tenderness_var.get()
 
         # =====================================================
         # LABORATORY
         # =====================================================
 
-        patient["Appendix_Diameter"] = (None if self.laboratory_frame.appendix_diameter_var.get().strip() == "" else float(self.laboratory_frame.appendix_diameter_var.get()))
-        patient["WBC_Count"] = (None if self.laboratory_frame.wbc_count_var.get().strip() == "" else float(self.laboratory_frame.wbc_count_var.get()))
-        patient["CRP"] = (None if self.laboratory_frame.crp_var.get().strip() == "" else float(self.laboratory_frame.crp_var.get()))
-        patient["Neutrophil_Percentage"] = (None if self.laboratory_frame.neutrophil_percentage_var.get().strip() == "" else float(self.laboratory_frame.neutrophil_percentage_var.get()))
-        patient["Segmented_Neutrophils"] = (None if self.laboratory_frame.segmented_neutrophils_var.get().strip() == "" else float(self.laboratory_frame.segmented_neutrophils_var.get()))
-        patient["Neutrophilia"] = (self.laboratory_frame.neutrophilia_var.get())
-        patient["RBC_Count"] = (None if self.laboratory_frame.rbc_count_var.get().strip() == "" else float(self.laboratory_frame.rbc_count_var.get()))
-        patient["Hemoglobin"] = (None if self.laboratory_frame.hemoglobin_var.get().strip() == "" else float(self.laboratory_frame.hemoglobin_var.get()))
-        patient["RDW"] = (None if self.laboratory_frame.rdw_var.get().strip() == "" else float(self.laboratory_frame.rdw_var.get()))
-        patient["Thrombocyte_Count"] = (None if self.laboratory_frame.thrombocyte_count_var.get().strip() == "" else float(self.laboratory_frame.thrombocyte_count_var.get()))
-        patient["Ketones_in_Urine"] = (self.laboratory_frame.ketones_in_urine_var.get())
-        patient["RBC_in_Urine"] = (self.laboratory_frame.rbc_in_urine_var.get())
-        patient["WBC_in_Urine"] = (self.laboratory_frame.wbc_in_urine_var.get())
+        patient["Appendix_Diameter"] = (None if self.appendix_diameter_var.get().strip() == "" else float(self.appendix_diameter_var.get()))
+        patient["WBC_Count"] = (None if self.wbc_count_var.get().strip() == "" else float(self.wbc_count_var.get()))
+        patient["CRP"] = (None if self.crp_var.get().strip() == "" else float(self.crp_var.get()))
+        patient["Neutrophil_Percentage"] = (None if self.neutrophil_percentage_var.get().strip() == "" else float(self.neutrophil_percentage_var.get()))
+        patient["Segmented_Neutrophils"] = (None if self.segmented_neutrophils_var.get().strip() == "" else float(self.segmented_neutrophils_var.get()))
+        patient["Neutrophilia"] = self.neutrophilia_var.get()
+        patient["RBC_Count"] = (None if self.rbc_count_var.get().strip() == "" else float(self.rbc_count_var.get()))
+        patient["Hemoglobin"] = (None if self.hemoglobin_var.get().strip() == "" else float(self.hemoglobin_var.get()))
+        patient["RDW"] = (None if self.rdw_var.get().strip() == "" else float(self.rdw_var.get()))
+        patient["Thrombocyte_Count"] = (None if self.thrombocyte_count_var.get().strip() == "" else float(self.thrombocyte_count_var.get()))
+        patient["Ketones_in_Urine"] = self.ketones_in_urine_var.get()
+        patient["RBC_in_Urine"] = self.rbc_in_urine_var.get()
+        patient["WBC_in_Urine"] = self.wbc_in_urine_var.get()
 
         # =====================================================
         # ULTRASOUND
         # =====================================================
 
         patient["Appendix_on_US"] = self.appendix_on_us_var.get()
+        patient["Free_Fluids"] = self.free_fluids_var.get()
+        patient["Appendix_Wall_Layers"] = self.appendix_wall_layers_var.get()
         patient["Target_Sign"] = self.target_sign_var.get()
         patient["Appendicolith"] = self.appendicolith_var.get()
         patient["Perfusion"] = self.perfusion_var.get()
         patient["Perforation"] = self.perforation_var.get()
         patient["Surrounding_Tissue_Reaction"] = self.surrounding_tissue_reaction_var.get()
-        patient["Free_Fluids"] = self.free_fluids_var.get()
 
         # =====================================================
         # ULTRASOUND COMPLICATIONS
         # =====================================================
 
-        patient["Appendicular_Abscess"] = (self.complications_frame.appendicular_abscess_var.get())
-        patient["Abscess_Location"] = (self.complications_frame.abscess_location_var.get())
-        patient["Pathological_Lymph_Nodes"] = (self.complications_frame.pathological_lymph_nodes_var.get())
-        patient["Lymph_Nodes_Location"] = (self.complications_frame.lymph_nodes_location_var.get())
-        patient["Bowel_Wall_Thickening"] = (self.complications_frame.bowel_wall_thickening_var.get())
-        patient["Conglomerate_of_Bowel_Loops"] = (self.complications_frame.conglomerate_of_bowel_loops_var.get())
-        patient["Ileus"] = (self.complications_frame.ileus_var.get())
-        patient["Coprostasis"] = (self.complications_frame.coprostasis_var.get())
-        patient["Meteorism"] = (self.complications_frame.meteorism_var.get())
-        patient["Enteritis"] = (self.complications_frame.enteritis_var.get())
+        patient["Appendicular_Abscess"] = self.appendicular_abscess_var.get()
+        patient["Abscess_Location"] = self.abscess_location_var.get()
+        patient["Pathological_Lymph_Nodes"] = self.pathological_lymph_nodes_var.get()
+        patient["Lymph_Nodes_Location"] = self.lymph_nodes_location_var.get()
+        patient["Bowel_Wall_Thickening"] = self.bowel_wall_thickening_var.get()
+        patient["Conglomerate_of_Bowel_Loops"] = self.conglomerate_of_bowel_loops_var.get()
+        patient["Ileus"] = self.ileus_var.get()
+        patient["Coprostasis"] = self.coprostasis_var.get()
+        patient["Meteorism"] = self.meteorism_var.get()
+        patient["Enteritis"] = self.enteritis_var.get()
 
         return patient
-
 
     # =====================================================
     # PREDICTION
@@ -342,17 +335,13 @@ class AppendicitisGUI:
 
     def predict(self):
         try:
-            model_name = self.model_var.get()
-            if model_name == "":
-                messagebox.showwarning("Model Required", "Please select a prediction model.")
-                return
-
             patient = self.collect_inputs()
-            result = self.backend.predict(model_name=model_name, input_data=patient)
+            result = self.backend.predict_all(patient)
             self.display_result(result)
 
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
+
         except Exception as e:
             messagebox.showerror("Prediction Error", f"An unexpected error occurred.\n\n{e}")
 

@@ -7,58 +7,113 @@ class ResultFrame:
         self.parent = parent
         self.app = app
         self.frame = None
+        self.model_labels = {}
 
 
     def build(self):
         self.frame = create_section_frame(parent=self.parent, title="Prediction Result")
         self.frame.columnconfigure(0, weight=1)
-        self.model_label = tk.Label(self.frame, text="Model : -", anchor="w", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
-        self.model_label.grid(row=0, column=0, sticky="w", padx=10, pady=4)
-        self.diagnosis_label = tk.Label(self.frame, text="Diagnosis : -", anchor="w", font=("Segoe UI", 14, "bold"), bg=self.app.COLOR_FRAME, fg=self.app.COLOR_PRIMARY)
-        self.diagnosis_label.grid(row=1, column=0, sticky="w", padx=10, pady=6)
-        self.appendicitis_prob_label = tk.Label(self.frame, text="Appendicitis Probability : -", anchor="w", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
-        self.appendicitis_prob_label.grid(row=2, column=0, sticky="w", padx=10, pady=4)
-        self.no_appendicitis_prob_label = tk.Label(self.frame, text="No Appendicitis Probability : -", anchor="w", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME )
-        self.no_appendicitis_prob_label.grid(row=3, column=0, sticky="w", padx=10, pady=4)
-        self.threshold_label = tk.Label(self.frame, text="Decision Threshold : -", anchor="w", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
-        self.threshold_label.grid(row=4, column=0, sticky="w", padx=10, pady=4)
-        self.laboratory_label = tk.Label(self.frame, text="Laboratory Status : -", anchor="w", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
-        self.laboratory_label.grid(row=5, column=0, sticky="w", padx=10, pady=4)
-        self.missing_label = tk.Label(self.frame, text="Missing Laboratory Fields : -", anchor="w", justify="left", wraplength=1000, font=self.app.FONT_SMALL, bg=self.app.COLOR_FRAME)
-        self.missing_label.grid(row=6, column=0, sticky="w", padx=10, pady=4)
+        row = 0
+
+        # ==============================
+        # MODEL RESULTS
+        # ==============================
+
+        title = tk.Label(self.frame, text="Individual Model Predictions", font=self.app.FONT_SECTION, bg=self.app.COLOR_FRAME)
+        title.grid(row=row, column=0, sticky="w", padx=10, pady=8)
+        row += 1
+        for model_name in ["Decision Tree", "Gradient Boosting", "XGBoost", "Transformer"]:
+            label = tk.Label(self.frame, text=f"{model_name}: -", anchor="w", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
+            label.grid(row=row, column=0, sticky="w", padx=20, pady=3)
+            self.model_labels[model_name] = label
+            row += 1
+
+        # ==============================
+        # CONSENSUS RESULT
+        # ==============================
+
+        row += 1
+        self.consensus_label = tk.Label(self.frame, text="Consensus Diagnosis : -", font=("Segoe UI",14,"bold"), bg=self.app.COLOR_FRAME, fg=self.app.COLOR_PRIMARY)
+        self.consensus_label.grid(row=row, column=0, sticky="w", padx=10, pady=8)
+        row += 1
+        self.agreement_label = tk.Label(self.frame, text="Model Agreement : -", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
+        self.agreement_label.grid(row=row, column=0, sticky="w", padx=10, pady=3)
+        row += 1
+        self.confidence_label = tk.Label( self.frame, text="Confidence : -", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME )
+        self.confidence_label.grid(row=row, column=0, sticky="w", padx=10, pady=3)
+        row += 1
+        self.highest_model_label = tk.Label(self.frame, text="Highest Confidence Model : -", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
+        self.highest_model_label.grid(row=row, column=0, sticky="w", padx=10, pady=3)
+        row += 1
+        self.highest_probability_label = tk.Label(self.frame, text="Highest Probability : -", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
+        self.highest_probability_label.grid(row=row, column=0, sticky="w", padx=10, pady=3)
+        row += 1
+        self.laboratory_label = tk.Label(self.frame, text="Laboratory Status : -", font=self.app.FONT_NORMAL, bg=self.app.COLOR_FRAME)
+        self.laboratory_label.grid(row=row, column=0, sticky="w", padx=10, pady=3)
+        row += 1
+        self.missing_label = tk.Label(self.frame, text="Missing Laboratory Fields : -", justify="left", wraplength=1000, font=self.app.FONT_SMALL, bg=self.app.COLOR_FRAME)
+        self.missing_label.grid(row=row, column=0, sticky="w", padx=10, pady=5)
 
 
     def update_results(self, result):
-        self.model_label.config(text=f"Model : {result['model']}")
-        self.diagnosis_label.config(text=f"Diagnosis : {result['diagnosis']}")
 
-        if result["prediction"] == 1:
-            self.diagnosis_label.config(fg=self.app.COLOR_DANGER)
+        # ==============================
+        # DISPLAY EACH MODEL
+        # ==============================
+
+        for model_name, model_result in result["models"].items():
+            prediction = model_result["diagnosis"]
+            probability = model_result["prob_appendicitis"]
+            threshold = model_result["threshold"]
+            text = (f"{model_name}: " f"{prediction} | " f"Appendicitis Probability: {probability:.2%} | " f"Threshold: {threshold:.2f}")
+            self.model_labels[model_name].config(text=text)
+
+        # ==============================
+        # FINAL CONSENSUS
+        # ==============================
+
+        diagnosis = result["diagnosis"]
+        self.consensus_label.config(text=f"Consensus Diagnosis : {diagnosis}")
+        
+        if diagnosis == "Appendicitis":
+            self.consensus_label.config(fg=self.app.COLOR_DANGER)
+        elif diagnosis == "No Appendicitis":
+            self.consensus_label.config(fg=self.app.COLOR_SUCCESS)
         else:
-            self.diagnosis_label.config(fg=self.app.COLOR_SUCCESS)
+            self.consensus_label.config(fg=self.app.COLOR_WARNING)
 
-        self.appendicitis_prob_label.config(text=f"Appendicitis Probability : {result['prob_appendicitis']:.2%}")
-        self.no_appendicitis_prob_label.config(text=f"No Appendicitis Probability : {result['prob_no_appendicitis']:.2%}")
-        self.threshold_label.config(text=f"Decision Threshold : {result['threshold']:.2f}")
+        self.agreement_label.config(text=(f"Model Agreement : " f"{result['agreement']}/{result['total_models']}"))
+        self.confidence_label.config(text=f"Confidence : {result['confidence']}")
+        self.highest_model_label.config(text=(f"Highest Confidence Model : " f"{result['highest_model']}"))
+        self.highest_probability_label.config(text=(f"Highest Probability : " f"{result['highest_probability']:.2%}"))
 
-        if result["laboratory_available"]:
+        # ==============================
+        # LAB STATUS
+        # ==============================
+
+        missing_fields = []
+        for model_result in result["models"].values():
+            if len(model_result["missing_laboratory_fields"]) > 0:
+                missing_fields.extend(model_result["missing_laboratory_fields"])
+
+        missing_fields = sorted(list(set(missing_fields)))
+        
+        if len(missing_fields)==0:
             self.laboratory_label.config(text="Laboratory Status : Complete")
-        else:
-            self.laboratory_label.config(text="Laboratory Status : Missing Laboratory Values")
-
-        missing = result["missing_laboratory_fields"]
-
-        if len(missing) == 0:
             self.missing_label.config(text="Missing Laboratory Fields : None")
         else:
-            self.missing_label.config(text="Missing Laboratory Fields :\n" + "\n".join(missing))
+            self.laboratory_label.config(text="Laboratory Status : Missing Values")
+            self.missing_label.config(text=("Missing Laboratory Fields:\n" + "\n".join(missing_fields)))
 
 
     def clear(self):
-        self.model_label.config(text="Model : -")
-        self.diagnosis_label.config(text="Diagnosis : -", fg=self.app.COLOR_PRIMARY)
-        self.appendicitis_prob_label.config(text="Appendicitis Probability : -")
-        self.no_appendicitis_prob_label.config(text="No Appendicitis Probability : -")
-        self.threshold_label.config(text="Decision Threshold : -")
-        self.laboratory_label.config(text="Laboratory Status : -")
+        for model_name,label in self.model_labels.items():
+            label.config(text=f"{model_name}: -")
+
+        self.consensus_label.config(text="Consensus Diagnosis : -", fg=self.app.COLOR_PRIMARY)
+        self.agreement_label.config(text="Model Agreement : -")
+        self.confidence_label.config(text="Confidence : -")
+        self.highest_model_label.config(text="Highest Confidence Model : -")
+        self.highest_probability_label.config(text="Highest Probability : -")
+        self.laboratory_label.config(text="Laboratory Status : Unknown")
         self.missing_label.config(text="Missing Laboratory Fields : -")

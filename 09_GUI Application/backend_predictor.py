@@ -117,7 +117,6 @@ class TransformerInference:
         checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
 
         self.temperature = checkpoint.get("temperature", 1.0)
-        self.threshold = checkpoint.get("threshold", 0.70)
         self.feature_info = checkpoint["feature_info"]
         self.feature_order = checkpoint["feature_order"]
         self.numerical_features = checkpoint["numerical_features"]
@@ -162,6 +161,7 @@ class AppendicitisPredictor:
     def __init__(self):
         self.base_path = Path(__file__).parent
         self.models = {}
+        self.thresholds = {"Decision Tree": 0.40, "Gradient Boosting": 0.40, "XGBoost": 0.40, "Transformer": 0.70}
         self.ml_pipeline = None
         self.transformer_pipeline = None
         self.feature_columns = None
@@ -200,8 +200,6 @@ class AppendicitisPredictor:
         with open(ml_files[-1], "rb") as f:
             pipeline = pickle.load(f)
             self.ml_pipeline = pipeline["preprocessor"]
-            self.ml_label_encoder = pipeline["label_encoder"]
-            self.ml_feature_names = pipeline["feature_names"]
         
         with open(transformer_files[-1], "rb") as f:
             pipeline = pickle.load(f)
@@ -217,7 +215,6 @@ class AppendicitisPredictor:
 
         self.transformer_scaler = pipeline["scaler"]
         self.transformer_label_encoders = pipeline["label_encoders"]
-        self.transformer_target_encoder = pipeline["target_encoder"]
 
         print("[OK] ML preprocessing loaded")
         print("[OK] Transformer preprocessing loaded")
@@ -236,6 +233,7 @@ class AppendicitisPredictor:
         }
 
         loaded = 0
+
         for model_name, filename in model_files.items():
             model_path = model_dir / filename
             if not model_path.exists():
@@ -245,15 +243,24 @@ class AppendicitisPredictor:
                 if model_name == "Transformer":
                     self.models[model_name] = TransformerInference(model_path)
                 else:
-                    with open(model_path,"rb") as f:
-                        self.models[model_name] = pickle.load(f)
+                    with open(model_path, "rb") as f:
+                        loaded_object = pickle.load(f)
 
+                    if isinstance(loaded_object, dict):
+                        if "model" in loaded_object:
+                            model = loaded_object["model"]
+                            if "threshold" in loaded_object:
+                                model.threshold = loaded_object["threshold"]
+                            self.models[model_name] = model
+                        else:
+                            raise RuntimeError(f"{filename} is a dictionary but contains no 'model' key.")
+                    else:
+                        self.models[model_name] = loaded_object
                 loaded += 1
                 print(f"[OK] Loaded {model_name}")
 
             except Exception as e:
                 print(f"[ERROR] Could not load {model_name}: {e}")
-        
         self.is_loaded = loaded > 0
         print(f"[INFO] Loaded {loaded} model(s).")
 
@@ -299,10 +306,16 @@ class AppendicitisPredictor:
         if model_name not in self.models:
             return None
         model = self.models[model_name]
+        print("---------------------------")
+        print("Requested:", model_name)
+        print("Stored models:", self.models.keys())
+        print("Loaded object:", type(self.models[model_name]))
+        print(self.models[model_name])
+        print("---------------------------")
         return {"name": model_name, "type": type(model).__name__, "loaded": True, "supports_probability": hasattr(model, "predict_proba")}
 
 
-    def predict(self, model_name, input_data, lab_available=True):
+    def predict(self, model_name, input_data):
         if model_name not in self.models:
             raise ValueError(f"Model '{model_name}' not found.")
         errors = validate_inputs(input_data)
@@ -321,7 +334,7 @@ class AppendicitisPredictor:
         probabilities = model.predict_proba(X)
         prob_no = float(probabilities[0][0])
         prob_appendicitis = float(probabilities[0][1])
-        threshold = getattr(model, "threshold", 0.70)
+        threshold = self.thresholds.get(model_name, 0.50)
         prediction = int(prob_appendicitis >= threshold)
         diagnosis = ("Appendicitis" if prediction == 1 else "No Appendicitis")
         lab_available = len(missing_labs) == 0
@@ -337,8 +350,71 @@ class AppendicitisPredictor:
             "model": model_name
         }
 
+
+    def predict_all(self, input_data):
+        errors = validate_inputs(input_data)
+        if errors:
+            raise ValueError("\n".join(errors))
+        results = {}
+        for model_name in self.get_available_models():
+            results[model_name] = self.predict(model_name=model_name, input_data=input_data)
+        return self.build_consensus(results)
+
+
+
+    def build_consensus(self, model_results):
+        positive = 0
+        negative = 0
+        highest_probability = -1
+        highest_model = None
+        missing_fields = set()
+
+        for model_name, result in model_results.items():
+            if result["prediction"] == 1:
+                positive += 1
+            else:
+                negative += 1
+
+            confidence = max(result["prob_appendicitis"], result["prob_no_appendicitis"])
+            if confidence > highest_probability:
+                highest_probability = confidence
+                highest_model = model_name
+            missing_fields.update(result["missing_laboratory_fields"])
+
+        if positive > negative:
+            final_prediction = 1
+            diagnosis = "Appendicitis"
+        elif negative > positive:
+            final_prediction = 0
+            diagnosis = "No Appendicitis"
+        else:
+            final_prediction = None
+            diagnosis = "Tie Between Models"
+        agreement = max(positive, negative)
+        if agreement == 4:
+            confidence = "Very High"
+        elif agreement == 3:
+            confidence = "High"
+        elif agreement == 2:
+            confidence = "Low"
+        else:
+            confidence = "Uncertain"
+
+        return {
+            "models": model_results,
+            "final_prediction": final_prediction,
+            "diagnosis": diagnosis,
+            "agreement": agreement,
+            "total_models": len(model_results),
+            "confidence": confidence,
+            "highest_probability": highest_probability,
+            "highest_model": highest_model,
+            "missing_laboratory_fields": sorted(missing_fields),
+            "laboratory_available": len(missing_fields) == 0
+        }
+
+
 if __name__ == "__main__":
     predictor = AppendicitisPredictor()
-
     print("\nAvailable Models:")
     print(predictor.get_available_models())
