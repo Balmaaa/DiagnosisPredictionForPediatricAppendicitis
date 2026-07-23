@@ -91,19 +91,14 @@ class ResultFrame:
         # LAB STATUS
         # ==============================
 
-        missing_fields = []
-        for model_result in result["models"].values():
-            if len(model_result["missing_laboratory_fields"]) > 0:
-                missing_fields.extend(model_result["missing_laboratory_fields"])
-
-        missing_fields = sorted(list(set(missing_fields)))
+        missing_fields = result["missing_laboratory_fields"]
         
-        if len(missing_fields)==0:
+        if result["laboratory_available"]:
             self.laboratory_label.config(text="Laboratory Status : Complete")
             self.missing_label.config(text="Missing Laboratory Fields : None")
         else:
             self.laboratory_label.config(text="Laboratory Status : Missing Values")
-            self.missing_label.config(text=("Missing Laboratory Fields:\n" + "\n".join(missing_fields)))
+            self.missing_label.config(text="Missing Laboratory Fields:\n" + "\n".join(missing_fields))
 
 
     def clear(self):
