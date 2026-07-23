@@ -221,6 +221,10 @@ class AppendicitisPredictor:
 
         if hasattr(self.ml_pipeline, "feature_names_in_"):
             self.feature_columns = list(self.ml_pipeline.feature_names_in_)
+        elif "feature_names" in pipeline:
+            self.feature_columns = pipeline["feature_names"]
+        else:
+            raise RuntimeError("Unable to determine ML preprocessing feature order.")
 
 
     def load_models(self):
@@ -271,9 +275,16 @@ class AppendicitisPredictor:
             if col not in df.columns:
                 df[col] = np.nan
 
-        df = df[self.feature_columns]
+        df = df.reindex(columns=self.feature_columns)
         df = df.replace("", np.nan)
         df = df.replace({None: np.nan})
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        for col in self.feature_columns:
+            if col in df.columns and col not in numeric_cols:
+                try:
+                    df[col] = pd.to_numeric(df[col], errors="ignore")
+                except Exception:
+                    pass
         return self.ml_pipeline.transform(df)
 
 
@@ -283,9 +294,13 @@ class AppendicitisPredictor:
             if col not in df.columns:
                 df[col] = np.nan
 
-        df = df[self.transformer_feature_order]
+        df = df.reindex(columns=self.transformer_feature_order)
         df = df.replace("", np.nan)
         df = df.replace({None: np.nan})
+        for col in self.transformer_numerical:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+        for col in self.transformer_categorical:
+            df[col] = df[col].astype("object")
         df[self.transformer_numerical] = self.transformer_num_imputer.transform(df[self.transformer_numerical])
         df[self.transformer_categorical] = self.transformer_cat_imputer.transform(df[self.transformer_categorical])
         df[self.transformer_numerical] = self.transformer_scaler.transform(df[self.transformer_numerical])
@@ -334,7 +349,7 @@ class AppendicitisPredictor:
         probabilities = model.predict_proba(X)
         prob_no = float(probabilities[0][0])
         prob_appendicitis = float(probabilities[0][1])
-        threshold = self.thresholds.get(model_name, 0.50)
+        threshold = getattr(model, "threshold", self.thresholds.get(model_name, 0.50))
         prediction = int(prob_appendicitis >= threshold)
         diagnosis = ("Appendicitis" if prediction == 1 else "No Appendicitis")
         lab_available = len(missing_labs) == 0
