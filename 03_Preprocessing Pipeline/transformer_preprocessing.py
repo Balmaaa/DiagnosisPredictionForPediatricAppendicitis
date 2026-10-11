@@ -58,10 +58,11 @@ LOCATION_MAPPING = {
     "an den m. psoas rechts": "right_psoas"
 }
 
+# Fixed: Use lowercase keys to match lowercase normalization
 ORDINAL_MAPPINGS = {
-    "Ketones_in_Urine": {"No": 0, "+": 1, "++": 2, "+++": 3},
-    "RBC_in_Urine": {"No": 0, "+": 1, "++": 2, "+++": 3},
-    "WBC_in_Urine": {"No": 0, "+": 1, "++": 2, "+++": 3}
+    "Ketones_in_Urine": {"no": 0, "+": 1, "++": 2, "+++": 3},
+    "RBC_in_Urine": {"no": 0, "+": 1, "++": 2, "+++": 3},
+    "WBC_in_Urine": {"no": 0, "+": 1, "++": 2, "+++": 3}
 }
 
 # ============================================================
@@ -136,7 +137,9 @@ def normalize_dataframe(df):
 
     for col, mapping in ORDINAL_MAPPINGS.items():
         if col in df.columns:
-            df[col] = df[col].replace(mapping).astype(float)
+            # Map lowercase values cleanly and coerce unmatched strings to NaN safely
+            df[col] = df[col].replace(mapping)
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
     for col in ["Lymph_Nodes_Location", "Abscess_Location"]:
         if col in df.columns:

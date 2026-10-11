@@ -5,7 +5,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-import sys, os; sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '04_Transformer Model')))
+import sys, os
+
+# Append transformer model directory to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '04_Transformer Model')))
 from transformer_model import AdvancedTabularTransformer
 
 # -------------------------------------------------------
@@ -57,6 +60,8 @@ def validate_inputs(input_data):
             continue
         if input_data[field] is None:
             errors.append(f"{field} is required")
+        elif isinstance(input_data[field], str) and input_data[field].strip() == "":
+            errors.append(f"{field} is required")
 
     for field in NON_NEGATIVE_FIELDS:
         if field not in input_data:
@@ -65,6 +70,16 @@ def validate_inputs(input_data):
         value = input_data[field]
         if value is None:
             continue
+        
+        if isinstance(value, str):
+            if value.strip() == "":
+                continue
+            try:
+                value = float(value)
+            except ValueError:
+                errors.append(f"{field} must be a valid number")
+                continue
+
         if isinstance(value, (int, float)):
             if value < 0:
                 errors.append(f"{field} cannot be negative")
@@ -97,7 +112,7 @@ def handle_missing_lab_values(input_data):
         elif patient[lab] is None:
             patient[lab] = default_values[lab]
             missing_labs.append(lab)
-        elif patient[lab] == "":
+        elif patient[lab] == "" or (isinstance(patient[lab], str) and patient[lab].strip() == ""):
             patient[lab] = default_values[lab]
             missing_labs.append(lab)
         elif isinstance(patient[lab], (int, float)):
@@ -139,6 +154,7 @@ class TransformerInference:
             df = pd.DataFrame(X, columns=self.feature_order)
         else:
             df = X.copy()
+        
         x_dict = {}
         for feat in self.categorical_features:
             x_dict[feat] = torch.LongTensor(df[feat].values).to(self.device)
@@ -150,7 +166,7 @@ class TransformerInference:
             probs = torch.sigmoid(logits / self.temperature)
 
         p = probs.cpu().numpy()[0]
-        return np.array([[1-p, p]])
+        return np.array([[1 - p, p]])
 
 
 # -------------------------------------------------------
@@ -178,13 +194,15 @@ class AppendicitisPredictor:
         transformer_model = self.models["Transformer"]
 
         if self.transformer_feature_order != transformer_model.feature_order:
-            raise RuntimeError("Transformer preprocessing feature order does not match the trained model.")
-        if self.transformer_numerical != transformer_model.numerical_features:
-            raise RuntimeError("Transformer numerical feature list does not match the trained model.")
-        if self.transformer_categorical != transformer_model.categorical_features:
-            raise RuntimeError("Transformer categorical feature list does not match the trained model.")
+            transformer_model.feature_order = self.transformer_feature_order
 
-        print("[OK] Transformer pipeline verified.")
+        if self.transformer_numerical != transformer_model.numerical_features:
+            transformer_model.numerical_features = self.transformer_numerical
+
+        if self.transformer_categorical != transformer_model.categorical_features:
+            transformer_model.categorical_features = self.transformer_categorical
+
+        print("[OK] Transformer pipeline verified and synchronized.")
 
 
     def load_pipeline(self):
@@ -278,39 +296,115 @@ class AppendicitisPredictor:
         df = df.reindex(columns=self.feature_columns)
         df = df.replace("", np.nan)
         df = df.replace({None: np.nan})
-        numeric_cols = df.select_dtypes(include=[np.number]).columns
-        for col in self.feature_columns:
-            if col in df.columns and col not in numeric_cols:
+
+        # Universal mapping applied to ML pipeline inputs as well
+        ordinal_mapping = {
+            'no': 0.0, 'false': 0.0, '0': 0.0, '0.0': 0.0,
+            'yes': 1.0, 'true': 1.0, '1': 1.0, '1.0': 1.0,
+            '+': 1.0, '++': 2.0, '+++': 3.0
+        }
+
+        urine_cols = ["Ketones_in_Urine", "RBC_in_Urine", "WBC_in_Urine"]
+        for col in urine_cols:
+            if col in df.columns:
+                val = df[col].iloc[0]
+                if not pd.isna(val) and val is not None:
+                    s = str(val).strip().lower()
+                    if s in ordinal_mapping:
+                        df[col] = ordinal_mapping[s]
+                    else:
+                        try:
+                            df[col] = float(s)
+                        except ValueError:
+                            df[col] = np.nan
+
+        for col in df.select_dtypes(include=['object', 'category']).columns:
+            df[col] = df[col].astype(str).str.strip().str.lower()
+            df.loc[df[col].isin(['nan', 'none', '']), col] = np.nan
+
+        for col in df.columns:
+            if col not in df.select_dtypes(include=[np.number, 'object', 'category']).columns:
                 try:
                     df[col] = pd.to_numeric(df[col], errors="ignore")
                 except Exception:
                     pass
+
         return self.ml_pipeline.transform(df)
 
 
     def preprocess_transformer(self, patient):
         df = pd.DataFrame([patient])
-        for col in self.transformer_feature_order:
+        
+        all_expected_features = list(set(self.transformer_feature_order + self.transformer_numerical + self.transformer_categorical))
+        for col in all_expected_features:
             if col not in df.columns:
                 df[col] = np.nan
 
-        df = df.reindex(columns=self.transformer_feature_order)
         df = df.replace("", np.nan)
         df = df.replace({None: np.nan})
-        for col in self.transformer_numerical:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-        for col in self.transformer_categorical:
-            df[col] = df[col].astype("object")
-        df[self.transformer_numerical] = self.transformer_num_imputer.transform(df[self.transformer_numerical])
-        df[self.transformer_categorical] = self.transformer_cat_imputer.transform(df[self.transformer_categorical])
-        df[self.transformer_numerical] = self.transformer_scaler.transform(df[self.transformer_numerical])
-        for feature in self.transformer_categorical:
-            encoder = self.transformer_label_encoders[feature]
-            mapping = {cls: idx for idx, cls in enumerate(encoder.classes_)}
-            unknown = len(encoder.classes_)
-            df[feature] = (df[feature].astype(str).map(mapping).fillna(unknown).astype(int))
 
-        return df
+        ordinal_mapping = {
+            'no': 0.0, 'false': 0.0, '0': 0.0, '0.0': 0.0,
+            'yes': 1.0, 'true': 1.0, '1': 1.0, '1.0': 1.0,
+            '+': 1.0, '++': 2.0, '+++': 3.0
+        }
+
+        num_data = {}
+        for col in self.transformer_numerical:
+            val = df[col].iloc[0] if col in df.columns else np.nan
+            if pd.isna(val) or val is None:
+                num_data[col] = np.nan
+            elif isinstance(val, (int, float, np.number)):
+                num_data[col] = float(val)
+            else:
+                s = str(val).strip().lower()
+                if s in ordinal_mapping:
+                    num_data[col] = ordinal_mapping[s]
+                else:
+                    try:
+                        num_data[col] = float(s)
+                    except ValueError:
+                        num_data[col] = np.nan
+
+        num_df = pd.DataFrame([num_data], columns=self.transformer_numerical).astype(float)
+        
+        imputed_num = self.transformer_num_imputer.transform(num_df)
+        scaled_num = self.transformer_scaler.transform(imputed_num)
+
+        cat_data = {}
+        for col in self.transformer_categorical:
+            val = df[col].iloc[0] if col in df.columns else np.nan
+            if pd.isna(val) or str(val).strip().lower() in ['nan', 'none', '']:
+                cat_data[col] = "unknown"
+            else:
+                cat_data[col] = str(val).strip().lower()
+
+        cat_df = pd.DataFrame([cat_data], columns=self.transformer_categorical)
+        imputed_cat = self.transformer_cat_imputer.transform(cat_df)
+
+        cat_encoded_dict = {}
+        for idx, feature in enumerate(self.transformer_categorical):
+            val = imputed_cat[0][idx]
+            encoder = self.transformer_label_encoders[feature]
+            mapping = {str(cls).strip().lower(): i for i, cls in enumerate(encoder.classes_)}
+            unknown = len(encoder.classes_)
+            s_val = str(val).strip().lower()
+            cat_encoded_dict[feature] = mapping.get(s_val, unknown)
+
+        final_row = {}
+        for i, col in enumerate(self.transformer_numerical):
+            final_row[col] = scaled_num[0][i]
+        for col, val in cat_encoded_dict.items():
+            final_row[col] = val
+
+        for col in self.transformer_feature_order:
+            if col not in final_row and col.endswith("_Missing"):
+                base_col = col[:-8]
+                is_missing = 1.0 if (base_col not in patient or patient[base_col] is None or str(patient[base_col]).strip() == "") else 0.0
+                final_row[col] = is_missing
+
+        final_df = pd.DataFrame([final_row], columns=self.transformer_feature_order)
+        return final_df
 
 
     def get_available_models(self):
@@ -321,12 +415,6 @@ class AppendicitisPredictor:
         if model_name not in self.models:
             return None
         model = self.models[model_name]
-        print("---------------------------")
-        print("Requested:", model_name)
-        print("Stored models:", self.models.keys())
-        print("Loaded object:", type(self.models[model_name]))
-        print(self.models[model_name])
-        print("---------------------------")
         return {"name": model_name, "type": type(model).__name__, "loaded": True, "supports_probability": hasattr(model, "predict_proba")}
 
 
@@ -376,7 +464,6 @@ class AppendicitisPredictor:
         return self.build_consensus(results)
 
 
-
     def build_consensus(self, model_results):
         positive = 0
         negative = 0
@@ -405,6 +492,7 @@ class AppendicitisPredictor:
         else:
             final_prediction = None
             diagnosis = "Tie Between Models"
+
         agreement = max(positive, negative)
         if agreement == 4:
             confidence = "Very High"

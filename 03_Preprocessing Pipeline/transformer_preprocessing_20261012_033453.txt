@@ -8,6 +8,6 @@ Shape : (782, 60)
 TRANSFORMER PREPROCESSING (HARDENED)
 ============================================================
 Transformer Pipeline Saved Successfully:
-C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\transformer_pipeline_20261011_025919.pkl
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\transformer_pipeline_20261012_033453.pkl
 
 Preprocessing Finished Successfully.

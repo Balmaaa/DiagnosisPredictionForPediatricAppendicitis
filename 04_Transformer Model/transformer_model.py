@@ -440,7 +440,7 @@ def main():
         print(f"  False Positives: {metrics['fp']}")
         print(f"  False Negatives: {metrics['fn']}")
             
-        gui_checkpoint_path = Path(__file__).parent.parent / '09_GUI Application' / 'saved_models' / 'Transformer.pt'
+        gui_checkpoint_path = Path(__file__).parent.parent / '08_GUI Application' / 'saved_models' / 'Transformer.pt'
         gui_checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
         torch.save({

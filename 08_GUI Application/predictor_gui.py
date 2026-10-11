@@ -31,23 +31,36 @@ class AppendicitisGUI:
 
 
     def configure_theme(self):
-        self.COLOR_BACKGROUND = "#F5F7FA"
-        self.COLOR_PRIMARY = "#1565C0"
-        self.COLOR_SECONDARY = "#1976D2"
-        self.COLOR_SUCCESS = "#2E7D32"
-        self.COLOR_WARNING = "#F57C00"
-        self.COLOR_DANGER = "#C62828"
-        self.COLOR_WHITE = "#FFFFFF"
-        self.COLOR_FRAME = "#E3F2FD"
-        self.COLOR_ENTRY = "#FFFFFF"
+        # Modern Flat UI Palette (Clean & Minimalist Dashboard Aesthetic)
+        self.COLOR_BACKGROUND = "#F3F4F6"      # Soft light gray background
+        self.COLOR_PRIMARY = "#2563EB"         # Modern vibrant blue (Tailwind blue-600)
+        self.COLOR_SUCCESS = "#16A34A"         # Modern green
+        self.COLOR_WARNING = "#D97706"         # Modern amber
+        self.COLOR_DANGER = "#DC2626"          # Modern red
+        self.COLOR_WHITE = "#FFFFFF"           # Card surface color
+        self.COLOR_FRAME = "#FFFFFF"           # Clean white card containers
+        self.COLOR_TEXT = "#1F2937"            # Dark slate for high legibility
 
-        self.FONT_TITLE = ("Segoe UI", 20, "bold")
-        self.FONT_SECTION = ("Segoe UI", 12, "bold")
+        self.FONT_TITLE = ("Segoe UI", 18, "bold")
+        self.FONT_SECTION = ("Segoe UI", 11, "bold")
         self.FONT_NORMAL = ("Segoe UI", 10)
         self.FONT_RESULT = ("Segoe UI", 11, "bold")
         self.FONT_SMALL = ("Segoe UI", 9)
 
         self.root.configure(bg=self.COLOR_BACKGROUND)
+
+        # Configure Modern TTK Styles (Clam theme base)
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+
+        # Modern Combobox Style
+        self.style.configure(
+            "TCombobox",
+            fieldbackground="white",
+            background="white",
+            selectbackground=self.COLOR_PRIMARY,
+            borderwidth=1
+        )
 
 
     def initialize_backend(self):
@@ -198,165 +211,147 @@ class AppendicitisGUI:
             bg=self.COLOR_BACKGROUND,
             fg=self.COLOR_PRIMARY
         )
-        self.title_label.pack(pady=(10, 20))
+        self.title_label.pack(pady=(15, 15))
 
     
     def create_buttons(self):
         self.button_frame = tk.Frame(self.main_frame, bg=self.COLOR_BACKGROUND)
         self.button_frame.pack(fill="x", pady=20, padx=15)
+        
         self.predict_button = tk.Button(
             self.button_frame,
             text="Predict Diagnosis",
             command=self.predict,
             bg=self.COLOR_SUCCESS,
             fg="white",
-            font=("Segoe UI", 11, "bold"),
+            font=("Segoe UI", 10, "bold"),
+            relief="flat",
             padx=20,
-            pady=10
+            pady=10,
+            cursor="hand2"
         )
         self.predict_button.pack(side="left", padx=5)
+
         self.clear_button = tk.Button(
             self.button_frame,
-            text="Clear",
+            text="Clear Fields",
             command=self.clear_fields,
             bg=self.COLOR_WARNING,
             fg="white",
-            font=("Segoe UI", 11, "bold"),
+            font=("Segoe UI", 10, "bold"),
+            relief="flat",
             padx=20,
-            pady=10
+            pady=10,
+            cursor="hand2"
         )
         self.clear_button.pack(side="left", padx=5)
+
         self.exit_button = tk.Button(
             self.button_frame,
-            text="Exit",
+            text="Exit Application",
             command=self.root.destroy,
             bg=self.COLOR_DANGER,
             fg="white",
-            font=("Segoe UI", 11, "bold"),
+            font=("Segoe UI", 10, "bold"),
+            relief="flat",
             padx=20,
-            pady=10
+            pady=10,
+            cursor="hand2"
         )
         self.exit_button.pack(side="right", padx=5)
+
+
+    def _parse_float(self, val_str, field_name):
+        cleaned = val_str.strip()
+        if cleaned == "":
+            return None
+        try:
+            return float(cleaned)
+        except ValueError:
+            raise ValueError(f"Invalid numeric value for '{field_name}': '{val_str}'. Please enter a valid number.")
+
 
     def collect_inputs(self):
         patient = {}
 
-        # =====================================================
-        # PATIENT INFORMATION
-        # =====================================================
-
-        patient["Age"] = None if self.age_var.get().strip() == "" else float(self.age_var.get())
-
+        patient["Age"] = self._parse_float(self.age_var.get(), "Age")
         if patient["Age"] is None:
             raise ValueError("Age is required.")
 
-        patient["Sex"] = self.sex_var.get()
-
+        patient["Sex"] = self.sex_var.get().strip()
         if patient["Sex"] == "":
             raise ValueError("Sex is required.")
 
-        patient["Weight"] = None if self.weight_var.get().strip() == "" else float(self.weight_var.get())
-        patient["Height"] = None if self.height_var.get().strip() == "" else float(self.height_var.get())
-        patient["BMI"] = None if self.bmi_var.get().strip() == "" else float(self.bmi_var.get())
+        patient["Weight"] = self._parse_float(self.weight_var.get(), "Weight (kg)")
+        patient["Height"] = self._parse_float(self.height_var.get(), "Height (cm)")
+        patient["BMI"] = self._parse_float(self.bmi_var.get(), "BMI")
+        patient["Body_Temperature"] = self._parse_float(self.body_temperature_var.get(), "Body Temperature (°C)")
 
-        # =====================================================
-        # VITAL SIGNS
-        # =====================================================
+        # Symptoms
+        patient["Migratory_Pain"] = self.migratory_pain_var.get().strip()
+        patient["Lower_Right_Abd_Pain"] = self.lower_right_abd_pain_var.get().strip()
+        patient["Contralateral_Rebound_Tenderness"] = self.contralateral_rebound_tenderness_var.get().strip()
+        patient["Coughing_Pain"] = self.coughing_pain_var.get().strip()
+        patient["Nausea"] = self.nausea_var.get().strip()
+        patient["Loss_of_Appetite"] = self.loss_of_appetite_var.get().strip()
+        patient["Dysuria"] = self.dysuria_var.get().strip()
+        patient["Stool"] = self.stool_var.get().strip()
+        patient["Peritonitis"] = self.peritonitis_var.get().strip()
+        patient["Psoas_Sign"] = self.psoas_sign_var.get().strip()
+        patient["Ipsilateral_Rebound_Tenderness"] = self.ipsilateral_rebound_tenderness_var.get().strip()
 
-        patient["Body_Temperature"] = (None if self.body_temperature_var.get().strip() == "" else float(self.body_temperature_var.get()))
+        # Laboratory
+        patient["Appendix_Diameter"] = self._parse_float(self.appendix_diameter_var.get(), "Appendix Diameter")
+        patient["WBC_Count"] = self._parse_float(self.wbc_count_var.get(), "WBC Count")
+        patient["CRP"] = self._parse_float(self.crp_var.get(), "CRP")
+        patient["Neutrophil_Percentage"] = self._parse_float(self.neutrophil_percentage_var.get(), "Neutrophil Percentage")
+        patient["Segmented_Neutrophils"] = self._parse_float(self.segmented_neutrophils_var.get(), "Segmented Neutrophils")
+        patient["Neutrophilia"] = self.neutrophilia_var.get().strip()
+        patient["RBC_Count"] = self._parse_float(self.rbc_count_var.get(), "RBC Count")
+        patient["Hemoglobin"] = self._parse_float(self.hemoglobin_var.get(), "Hemoglobin")
+        patient["RDW"] = self._parse_float(self.rdw_var.get(), "RDW")
+        patient["Thrombocyte_Count"] = self._parse_float(self.thrombocyte_count_var.get(), "Thrombocyte Count")
+        patient["Ketones_in_Urine"] = self.ketones_in_urine_var.get().strip()
+        patient["RBC_in_Urine"] = self.rbc_in_urine_var.get().strip()
+        patient["WBC_in_Urine"] = self.wbc_in_urine_var.get().strip()
 
-        # =====================================================
-        # CLINICAL SYMPTOMS
-        # =====================================================
+        # Ultrasound
+        patient["Appendix_on_US"] = self.appendix_on_us_var.get().strip()
+        patient["Free_Fluids"] = self.free_fluids_var.get().strip()
+        patient["Appendix_Wall_Layers"] = self.appendix_wall_layers_var.get().strip()
+        patient["Target_Sign"] = self.target_sign_var.get().strip()
+        patient["Appendicolith"] = self.appendicolith_var.get().strip()
+        patient["Perfusion"] = self.perfusion_var.get().strip()
+        patient["Perforation"] = self.perforation_var.get().strip()
+        patient["Surrounding_Tissue_Reaction"] = self.surrounding_tissue_reaction_var.get().strip()
 
-        patient["Migratory_Pain"] = self.migratory_pain_var.get()
-        patient["Lower_Right_Abd_Pain"] = self.lower_right_abd_pain_var.get()
-        patient["Contralateral_Rebound_Tenderness"] = self.contralateral_rebound_tenderness_var.get()
-        patient["Coughing_Pain"] = self.coughing_pain_var.get()
-        patient["Nausea"] = self.nausea_var.get()
-        patient["Loss_of_Appetite"] = self.loss_of_appetite_var.get()
-        patient["Dysuria"] = self.dysuria_var.get()
-        patient["Stool"] = self.stool_var.get()
-        patient["Peritonitis"] = self.peritonitis_var.get()
-        patient["Psoas_Sign"] = self.psoas_sign_var.get()
-        patient["Ipsilateral_Rebound_Tenderness"] = self.ipsilateral_rebound_tenderness_var.get()
-
-        # =====================================================
-        # LABORATORY
-        # =====================================================
-
-        patient["Appendix_Diameter"] = (None if self.appendix_diameter_var.get().strip() == "" else float(self.appendix_diameter_var.get()))
-        patient["WBC_Count"] = (None if self.wbc_count_var.get().strip() == "" else float(self.wbc_count_var.get()))
-        patient["CRP"] = (None if self.crp_var.get().strip() == "" else float(self.crp_var.get()))
-        patient["Neutrophil_Percentage"] = (None if self.neutrophil_percentage_var.get().strip() == "" else float(self.neutrophil_percentage_var.get()))
-        patient["Segmented_Neutrophils"] = (None if self.segmented_neutrophils_var.get().strip() == "" else float(self.segmented_neutrophils_var.get()))
-        patient["Neutrophilia"] = self.neutrophilia_var.get()
-        patient["RBC_Count"] = (None if self.rbc_count_var.get().strip() == "" else float(self.rbc_count_var.get()))
-        patient["Hemoglobin"] = (None if self.hemoglobin_var.get().strip() == "" else float(self.hemoglobin_var.get()))
-        patient["RDW"] = (None if self.rdw_var.get().strip() == "" else float(self.rdw_var.get()))
-        patient["Thrombocyte_Count"] = (None if self.thrombocyte_count_var.get().strip() == "" else float(self.thrombocyte_count_var.get()))
-        patient["Ketones_in_Urine"] = self.ketones_in_urine_var.get()
-        patient["RBC_in_Urine"] = self.rbc_in_urine_var.get()
-        patient["WBC_in_Urine"] = self.wbc_in_urine_var.get()
-
-        # =====================================================
-        # ULTRASOUND
-        # =====================================================
-
-        patient["Appendix_on_US"] = self.appendix_on_us_var.get()
-        patient["Free_Fluids"] = self.free_fluids_var.get()
-        patient["Appendix_Wall_Layers"] = self.appendix_wall_layers_var.get()
-        patient["Target_Sign"] = self.target_sign_var.get()
-        patient["Appendicolith"] = self.appendicolith_var.get()
-        patient["Perfusion"] = self.perfusion_var.get()
-        patient["Perforation"] = self.perforation_var.get()
-        patient["Surrounding_Tissue_Reaction"] = self.surrounding_tissue_reaction_var.get()
-
-        # =====================================================
-        # ULTRASOUND COMPLICATIONS
-        # =====================================================
-
-        patient["Appendicular_Abscess"] = self.appendicular_abscess_var.get()
-        patient["Abscess_Location"] = self.abscess_location_var.get()
-        patient["Pathological_Lymph_Nodes"] = self.pathological_lymph_nodes_var.get()
-        patient["Lymph_Nodes_Location"] = self.lymph_nodes_location_var.get()
-        patient["Bowel_Wall_Thickening"] = self.bowel_wall_thickening_var.get()
-        patient["Conglomerate_of_Bowel_Loops"] = self.conglomerate_of_bowel_loops_var.get()
-        patient["Ileus"] = self.ileus_var.get()
-        patient["Coprostasis"] = self.coprostasis_var.get()
-        patient["Meteorism"] = self.meteorism_var.get()
-        patient["Enteritis"] = self.enteritis_var.get()
+        # Complications
+        patient["Appendicular_Abscess"] = self.appendicular_abscess_var.get().strip()
+        patient["Abscess_Location"] = self.abscess_location_var.get().strip()
+        patient["Pathological_Lymph_Nodes"] = self.pathological_lymph_nodes_var.get().strip()
+        patient["Lymph_Nodes_Location"] = self.lymph_nodes_location_var.get().strip()
+        patient["Bowel_Wall_Thickening"] = self.bowel_wall_thickening_var.get().strip()
+        patient["Conglomerate_of_Bowel_Loops"] = self.conglomerate_of_bowel_loops_var.get().strip()
+        patient["Ileus"] = self.ileus_var.get().strip()
+        patient["Coprostasis"] = self.coprostasis_var.get().strip()
+        patient["Meteorism"] = self.meteorism_var.get().strip()
+        patient["Enteritis"] = self.enteritis_var.get().strip()
 
         return patient
 
-    # =====================================================
-    # PREDICTION
-    # =====================================================
 
     def predict(self):
         try:
             patient = self.collect_inputs()
             result = self.backend.predict_all(patient)
-            self.display_result(result)
+            self.result_frame.update_results(result)
 
         except ValueError as e:
-            messagebox.showerror("Input Error", str(e))
+            messagebox.showerror("Input Validation Error", str(e))
 
         except Exception as e:
-            messagebox.showerror("Prediction Error", f"An unexpected error occurred.\n\n{e}")
+            messagebox.showerror("Prediction Error", f"An unexpected error occurred during model inference.\n\n{e}")
 
-
-    # =====================================================
-    # DISPLAY RESULT
-    # =====================================================
-
-    def display_result(self, result):
-        self.result_frame.update_results(result)
-
-
-    # =====================================================
-    # CLEAR ALL INPUTS
-    # =====================================================
 
     def clear_fields(self):
         self.patient_frame.clear()
