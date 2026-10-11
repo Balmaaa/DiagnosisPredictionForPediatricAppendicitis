@@ -13,45 +13,45 @@ Potential diagnosis columns found : 3
 
 Column : Diagnosis_Presumptive
 Unique Values : 16
-Missing Values : 782 (50.06%)
+Missing Values : 2 (0.26%)
 
 Value Distribution
-NaN                         782 (50.06%)
-appendicitis                682 (43.66%)
-no appendicitis              78 (4.99%)
-chronische Appendizitis       4 (0.26%)
-Gastroenteritis               3 (0.19%)
-chronische Bauchschmerzen     2 (0.13%)
-Appendizitis/ Lymphadenitis mesenterialis     1 (0.06%)
-Ovarialtorsion                1 (0.06%)
-prolongierte Gastroenteritis     1 (0.06%)
-Appendizitis, Lymphadenitis mesenterialis     1 (0.06%)
+appendicitis                682 (87.21%)
+no appendicitis              78 (9.97%)
+chronische Appendizitis       4 (0.51%)
+Gastroenteritis               3 (0.38%)
+NaN                           2 (0.26%)
+chronische Bauchschmerzen     2 (0.26%)
+Sepsis mit Begleitappendizitis     1 (0.13%)
+Bridenileus                   1 (0.13%)
+Adhäsionen des Colon ascendens     1 (0.13%)
+abdominelle Adhäsionen, chron. Unterbauchbeschwerden mit Subileussymptomatik     1 (0.13%)
 ... 7 more values
 
 Column : Diagnosis
 Unique Values : 2
-Missing Values : 3 (0.19%)
+Missing Values : 2 (0.26%)
 
 Value Distribution
-appendicitis                926 (59.28%)
-no appendicitis             633 (40.52%)
-NaN                           3 (0.19%)
+appendicitis                463 (59.21%)
+no appendicitis             317 (40.54%)
+NaN                           2 (0.26%)
 
 Column : Gynecological_Findings
 Unique Values : 13
-Missing Values : 1510 (96.67%)
+Missing Values : 756 (96.68%)
 
 Value Distribution
-NaN                        1510 (96.67%)
-keine                        18 (1.15%)
-Ovarialzyste                 10 (0.64%)
-Ovarialzysten                 4 (0.26%)
-Zyste Uterus                  2 (0.13%)
-In beiden Ovarien Zysten darstellbar, links Ovar mit regelrechter Perfusion, rechts etwas vergrößert, keine eindeutige Perfusion nachweisbar. Retrovesikal freie Flüssigkeit mit Binnenecho     2 (0.13%)
-Ausschluss pathologischer Ovarialbefund     2 (0.13%)
-kleine Ovarzyste rechts       2 (0.13%)
-kein Anhalt für eine gynäkologische Ursache der Beschwerden     2 (0.13%)
-V. a. Ovarialtorsion          2 (0.13%)
+NaN                         756 (96.68%)
+keine                         9 (1.15%)
+Ovarialzyste                  5 (0.64%)
+Ovarialzysten                 2 (0.26%)
+Zyste Uterus                  1 (0.13%)
+In beiden Ovarien Zysten darstellbar, links Ovar mit regelrechter Perfusion, rechts etwas vergrößert, keine eindeutige Perfusion nachweisbar. Retrovesikal freie Flüssigkeit mit Binnenecho     1 (0.13%)
+Ausschluss pathologischer Ovarialbefund     1 (0.13%)
+kleine Ovarzyste rechts       1 (0.13%)
+kein Anhalt für eine gynäkologische Ursache der Beschwerden     1 (0.13%)
+V. a. Ovarialtorsion          1 (0.13%)
 ... 4 more values
 
 ============================================================
@@ -90,19 +90,50 @@ TARGET VALIDATION - Integrated Dataset
 SUCCESS : Final Target Column -> Diagnosis
 
 ============================================================
+PREDICTOR LEAKAGE ANALYSIS - Integrated Dataset
+============================================================
+EXCLUDED : Patient_Record_ID (Identifier variable)
+EXCLUDED : Source_Dataset (Source variable)
+EXCLUDED : Diagnosis_Presumptive (Preliminary diagnosis variable)
+EXCLUDED : Length_of_Stay (Outcome-derived variable)
+EXCLUDED : Management (Outcome-derived variable)
+EXCLUDED : Severity (Outcome-related variable)
+EXCLUDED : Alvarado_Score (Clinical scoring system)
+EXCLUDED : Paedriatic_Appendicitis_Score (Clinical scoring system)
+EXCLUDED : US_Number (Excluded control variable)
+EXCLUDED : Gynecological_Findings (Specialty-specific variable)
+
+Total Predictor Leakage/Exclusion Columns : 10
+
+Final Predictor Exclusion List
+   Alvarado_Score
+   Diagnosis_Presumptive
+   Gynecological_Findings
+   Length_of_Stay
+   Management
+   Paedriatic_Appendicitis_Score
+   Patient_Record_ID
+   Severity
+   Source_Dataset
+   US_Number
+
+============================================================
 FINAL TARGET SUMMARY
 ============================================================
 Final Target Column : Diagnosis
 Target Leakage Status : PASSED
 
-The following columns were successfully excluded from being considered as prediction targets:
+The following columns were identified as unsuitable prediction targets or predictors:
 • Presumptive diagnosis variables
 • Outcome-derived variables
 • Clinical scoring systems
 • Specialty-specific diagnosis variables
+• Identifier/source variables
 
 Selected Machine Learning Target
     Diagnosis
+
+Total Predictor Leakage/Exclusion Columns : 10
 
 Remaining dataset columns will be treated as candidate predictor variables during preprocessing.
 

@@ -126,7 +126,10 @@ class GradientBoostingModel:
         print("=" * 70)
 
         cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=SEED)
-        scores = cross_validate(self.model, X_train, y_train, cv=cv, scoring=["accuracy", "precision", "recall", "f1"], n_jobs=-1)
+        scores = cross_validate(
+            self.model, X_train, y_train, cv=cv, 
+            scoring=["accuracy", "precision", "recall", "f1"], n_jobs=-1
+        )
 
         print(f"Accuracy : {scores['test_accuracy'].mean():.4f} ± {scores['test_accuracy'].std():.4f}")
         print(f"Precision: {scores['test_precision'].mean():.4f} ± {scores['test_precision'].std():.4f}")
@@ -142,8 +145,8 @@ class GradientBoostingModel:
         preds = (probs >= threshold).astype(int)
 
         acc = accuracy_score(y_test, preds)
-        prec = precision_score(y_test, preds)
-        rec = recall_score(y_test, preds)
+        prec = precision_score(y_test, preds, zero_division=0)
+        rec = recall_score(y_test, preds, zero_division=0)
 
         tn, fp, fn, tp = confusion_matrix(y_test, preds).ravel()
         specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
@@ -205,6 +208,7 @@ def main():
     X_train, X_test, y_train, y_test = gb.load_pipeline_data()
     gb.train(X_train, y_train, use_hyperparameter_tuning=True)
     gb.cross_validate_model(X_train, y_train)
+    
     train_predictions = gb.model.predict(X_train)
     train_accuracy = accuracy_score(y_train, train_predictions)
 

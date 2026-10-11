@@ -74,7 +74,7 @@ class XGBoostModel:
     # TRAIN MODEL
     # ============================================================
 
-    def train(self, X_train, y_train, use_hyperparameter_tuning=True,):
+    def train(self, X_train, y_train, use_hyperparameter_tuning=True):
         print("\nTraining XGBoost...")
         if use_hyperparameter_tuning:
             self.model = self.hyperparameter_tuning(X_train, y_train)
@@ -139,8 +139,8 @@ class XGBoostModel:
         probabilities = self.model.predict_proba(X_test)[:, 1]
         predictions = (probabilities >= threshold).astype(int)
         accuracy = accuracy_score(y_test, predictions)
-        precision = precision_score(y_test, predictions)
-        recall = recall_score(y_test, predictions)
+        precision = precision_score(y_test, predictions, zero_division=0)
+        recall = recall_score(y_test, predictions, zero_division=0)
         tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
         specificity = (tn / (tn + fp) if (tn + fp) > 0 else 0)
         ppv = (tp / (tp + fp) if (tp + fp) > 0 else 0)
@@ -166,7 +166,7 @@ class XGBoostModel:
     def get_feature_importance(self):
         importance = self.model.feature_importances_
         importance_df = pd.DataFrame({"Feature": self.feature_names, "Importance": importance})
-        importance_df = (importance_df.sort_values(by="Importance", ascending=False,).reset_index(drop=True))
+        importance_df = (importance_df.sort_values(by="Importance", ascending=False).reset_index(drop=True))
         return importance_df
 
     # ============================================================

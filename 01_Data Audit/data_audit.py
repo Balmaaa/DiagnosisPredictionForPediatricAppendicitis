@@ -156,26 +156,52 @@ def analysis_missing_value(df, dataset_name, output_file):
 
     print_save(f"Columns with Missing Values : {(missing_percentages > 0).sum()} out of {len(df.columns)}", output_file)
 
-    expected_missing_columns = {"Diagnosis_Presumptive"}
-
-    print_save("\nEXPECTED MISSING VALUES", output_file)
+    print_save("\nMISSING VALUES IN DIAGNOSIS_PRESUMPTIVE", output_file)
     print_save("-" * 60, output_file)
 
-    expected_found = False
+    column = "Diagnosis_Presumptive"
 
-    for column in expected_missing_columns:
-        if column in df.columns:
-            expected_found = True
+    if column in df.columns:
+        count = int(missing_counts[column])
+        percent = missing_percentages[column]
 
-            count = int(missing_counts[column])
-            percent = missing_percentages[column]
+        print_save(f"{column:<35} {count:>5} ({percent:.2f}%)", output_file)
 
-            print_save(f"{column:<35} {count:>5} ({percent:.2f}%)", output_file)
-            print_save("Reason : Column unavailable in Dataset 2 during integration.", output_file)
-            print_save("Action : Retain column. Handle during preprocessing if needed.\n", output_file)
+        if count > 0:
+            print_save("Reason : Missing values are present in the Dataset 1 source data.", output_file)
+            print_save(
+                "Action : Preserve the observed missing values and handle this "
+                "column according to the existing preprocessing and leakage-control rules.\n",
+                output_file)
+        else:
+            print_save("No missing values detected in this column.\n", output_file)
+    else:
+        print_save("[INFO] Diagnosis_Presumptive column not found in the dataset.", output_file)
 
-    if not expected_found:
-        print_save("No expected missing-value columns detected.", output_file)
+
+    # ========================================================
+    # TARGET VARIABLE CHECK
+    # ========================================================
+
+    target_column = "Diagnosis"
+    print_save("\nTARGET VARIABLE CHECK", output_file)
+    print_save("-" * 60, output_file)
+
+    if target_column in df.columns:
+        target_missing_count = int(missing_counts[target_column])
+        target_missing_percentage = missing_percentages[target_column]
+
+        print_save(f"Target Column : {target_column}", output_file)
+        print_save(f"Missing Target Values : " f"{target_missing_count} " f"({target_missing_percentage:.2f}%)", output_file)
+
+        if target_missing_count == 0:
+            print_save("[OK] No missing target values detected.", output_file)
+        else:
+            print_save("[WARNING] Missing target values detected.", output_file)
+            print_save("These records cannot be used as labeled samples " "for supervised model training.", output_file)
+
+    else:
+        print_save("[ERROR] Target column 'Diagnosis' not found.", output_file)
 
     print_save("\nCOLUMNS REQUIRING PREPROCESSING", output_file)
     print_save("-" * 60, output_file)
@@ -188,7 +214,9 @@ def analysis_missing_value(df, dataset_name, output_file):
         }
     )
 
-    missing_data = missing_data[~missing_data["Column"].isin(expected_missing_columns)]
+    excluded_from_preprocessing = {"Diagnosis_Presumptive", target_column}
+
+    missing_data = missing_data[~missing_data["Column"].isin(excluded_from_preprocessing)]
 
     missing_data = missing_data.sort_values("Missing %", ascending=False)
 

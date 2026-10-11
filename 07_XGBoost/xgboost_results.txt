@@ -3,7 +3,7 @@ XGBOOST - PIPELINE VERSION
 ======================================================================
 USING UPDATED XGBOOST (PIPELINE-COMPATIBLE)
 
-Loading pipeline: preprocessing_pipeline_20260704_054159.pkl
+Loading pipeline: preprocessing_pipeline_20261011_030007.pkl
 
 FEATURES USED BY THE MODEL
 ----------------------------------------------------------------------
@@ -115,7 +115,6 @@ Perfusion_No
 Perfusion_Unknown
 Perfusion_hyperperfused
 Perfusion_hypoperfused
-Perfusion_present
 Perforation_No
 Perforation_Unknown
 Perforation_Yes
@@ -130,16 +129,13 @@ Appendicular_Abscess_Yes
 Appendicular_Abscess_suspected
 Abscess_Location_Other
 Abscess_Location_Unknown
-Abscess_Location_douglas_pouch
 Pathological_Lymph_Nodes_No
 Pathological_Lymph_Nodes_Unknown
 Pathological_Lymph_Nodes_Yes
 Lymph_Nodes_Location_Other
 Lymph_Nodes_Location_Unknown
-Lymph_Nodes_Location_ileocecal
 Lymph_Nodes_Location_mesenteric
 Lymph_Nodes_Location_right_lower_quadrant
-Lymph_Nodes_Location_right_mid_abdomen
 Bowel_Wall_Thickening_No
 Bowel_Wall_Thickening_Unknown
 Bowel_Wall_Thickening_Yes
@@ -159,13 +155,13 @@ Enteritis_No
 Enteritis_Unknown
 Enteritis_Yes
 ----------------------------------------------------------------------
-Total Features : 151
+Total Features : 147
 
 Dataset Information
 ----------------------------------------------------------------------
-Training Samples : 1247
-Testing Samples  : 312
-Features         : 151
+Training Samples : 624
+Testing Samples  : 156
+Features         : 147
 
 Training XGBoost...
 
@@ -175,35 +171,35 @@ Fitting 5 folds for each of 72 candidates, totalling 360 fits
 Best Parameters
 ----------------------------------------------------------------------
 colsample_bytree    : 0.8
-learning_rate       : 0.05
+learning_rate       : 0.1
 max_depth           : 4
-n_estimators        : 200
-subsample           : 1.0
+n_estimators        : 100
+subsample           : 0.8
 ----------------------------------------------------------------------
-Best CV Recall : 0.9822
+Best CV Recall : 0.9622
 Training completed.
-Number of Trees : 200
+Number of Trees : 100
 
 ======================================================================
 TRAINING PERFORMANCE
 ======================================================================
-Training Accuracy : 0.9984
+Training Accuracy : 0.9952
 
 ======================================================================
 RESULTS
 ======================================================================
-Accuracy     : 0.9872
-Precision    : 0.9695
-Recall       : 1.0000
-Specificity  : 0.9784
-PPV          : 0.9695
-NPV          : 1.0000
+Accuracy     : 0.8846
+Precision    : 0.8866
+Recall       : 0.9247
+Specificity  : 0.8254
+PPV          : 0.8866
+NPV          : 0.8814
 
 CONFUSION MATRIX
-TP = 127
-TN = 181
-FP = 4
-FN = 0
+TP = 86
+TN = 52
+FP = 11
+FN = 7
 Model saved to GUI folder: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\XGBoost.pkl
 
 ======================================================================

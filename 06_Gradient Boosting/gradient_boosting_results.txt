@@ -2,7 +2,7 @@
 GRADIENT BOOSTING - PIPELINE VERSION
 ======================================================================
 USING UPDATED GRADIENT BOOSTING (PIPELINE-COMPATIBLE)
-Loading pipeline: preprocessing_pipeline_20260704_054159.pkl
+Loading pipeline: preprocessing_pipeline_20261011_030007.pkl
 
 FEATURES USED BY THE MODEL
 ----------------------------------------------------------------------
@@ -114,7 +114,6 @@ Perfusion_No
 Perfusion_Unknown
 Perfusion_hyperperfused
 Perfusion_hypoperfused
-Perfusion_present
 Perforation_No
 Perforation_Unknown
 Perforation_Yes
@@ -129,16 +128,13 @@ Appendicular_Abscess_Yes
 Appendicular_Abscess_suspected
 Abscess_Location_Other
 Abscess_Location_Unknown
-Abscess_Location_douglas_pouch
 Pathological_Lymph_Nodes_No
 Pathological_Lymph_Nodes_Unknown
 Pathological_Lymph_Nodes_Yes
 Lymph_Nodes_Location_Other
 Lymph_Nodes_Location_Unknown
-Lymph_Nodes_Location_ileocecal
 Lymph_Nodes_Location_mesenteric
 Lymph_Nodes_Location_right_lower_quadrant
-Lymph_Nodes_Location_right_mid_abdomen
 Bowel_Wall_Thickening_No
 Bowel_Wall_Thickening_Unknown
 Bowel_Wall_Thickening_Yes
@@ -158,77 +154,77 @@ Enteritis_No
 Enteritis_Unknown
 Enteritis_Yes
 ----------------------------------------------------------------------
-Total Features: 151
+Total Features: 147
 
 Dataset Information
 ----------------------------------------------------------------------
-Training samples : 1247
-Testing samples  : 312
-Features         : 151
+Training samples : 624
+Testing samples  : 156
+Features         : 147
 
 Training Gradient Boosting...
 Performing hyperparameter tuning...
 Fitting 5 folds for each of 72 candidates, totalling 360 fits
 
-Best Params: {'learning_rate': 0.05, 'max_depth': 3, 'min_samples_leaf': 10, 'n_estimators': 150, 'subsample': 0.8}
-Best CV Recall: 0.9525917297612114
+Best Params: {'learning_rate': 0.05, 'max_depth': 3, 'min_samples_leaf': 10, 'n_estimators': 100, 'subsample': 0.8}
+Best CV Recall: 0.9540540540540542
 
 Best Estimator
 GradientBoostingClassifier(learning_rate=0.05, min_samples_leaf=10,
-                           n_estimators=150, random_state=42, subsample=0.8)
+                           random_state=42, subsample=0.8)
 Training completed.
-Number of estimators: 150
+Number of estimators: 100
 
 ======================================================================
 10-FOLD CROSS VALIDATION
 ======================================================================
-Accuracy : 0.9567 ± 0.0209
-Precision: 0.9507 ± 0.0282
-Recall   : 0.9427 ± 0.0357
-F1 Score : 0.9463 ± 0.0263
+Accuracy : 0.9391 ± 0.0246
+Precision: 0.9469 ± 0.0280
+Recall   : 0.9514 ± 0.0265
+F1 Score : 0.9488 ± 0.0206
 
 ======================================================================
 TRAINING PERFORMANCE
 ======================================================================
-Training Accuracy : 0.9880
+Training Accuracy : 0.9663
 
 ======================================================================
 TOP 20 IMPORTANT FEATURES
 ======================================================================
                                Feature  Importance
-                     Appendix_Diameter    0.365771
-                     Appendix_on_US_No    0.187118
-     Ipsilateral_Rebound_Tenderness_No    0.066911
-                                   CRP    0.065923
-                             WBC_Count    0.053069
-Ipsilateral_Rebound_Tenderness_Unknown    0.044324
-                        Peritonitis_No    0.033831
-Ipsilateral_Rebound_Tenderness_Missing    0.032025
-                    Appendix_on_US_Yes    0.022393
-             Appendix_Diameter_Missing    0.016137
-                 Neutrophil_Percentage    0.010637
-   Surrounding_Tissue_Reaction_Missing    0.008978
-   Contralateral_Rebound_Tenderness_No    0.008141
-                             Nausea_No    0.006572
-       Surrounding_Tissue_Reaction_Yes    0.006359
-                            Hemoglobin    0.005943
-                     Thrombocyte_Count    0.005721
-   Surrounding_Tissue_Reaction_Unknown    0.004680
-                       US_Performed_No    0.004150
-                                   RDW    0.003653
+                     Appendix_Diameter    0.407649
+                     Appendix_on_US_No    0.178681
+     Ipsilateral_Rebound_Tenderness_No    0.083610
+                                   CRP    0.061335
+                             WBC_Count    0.058518
+Ipsilateral_Rebound_Tenderness_Missing    0.035667
+                    Appendix_on_US_Yes    0.028632
+                        Peritonitis_No    0.028433
+             Appendix_Diameter_Missing    0.017622
+Ipsilateral_Rebound_Tenderness_Unknown    0.016051
+                                   Age    0.010517
+                     Thrombocyte_Count    0.006481
+                 Neutrophil_Percentage    0.004968
+                            Hemoglobin    0.004583
+                             Nausea_No    0.004243
+   Surrounding_Tissue_Reaction_Unknown    0.004185
+                          RBC_in_Urine    0.003816
+       Surrounding_Tissue_Reaction_Yes    0.003734
+                             RBC_Count    0.003695
+                      Body_Temperature    0.003246
 
 ======================================================================
 RESULTS
 ======================================================================
-Accuracy     : 0.9519
-Precision    : 0.9375
-Recall       : 0.9449
-Specificity  : 0.9568
-PPV          : 0.9375
-NPV          : 0.9620
+Accuracy     : 0.8974
+Precision    : 0.9053
+Recall       : 0.9247
+Specificity  : 0.8571
+PPV          : 0.9053
+NPV          : 0.8852
 CONFUSION MATRIX:
-TP=120
-TN=177
-FP=8
+TP=86
+TN=54
+FP=9
 FN=7
 Model saved to GUI folder: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\GradientBoosting.pkl

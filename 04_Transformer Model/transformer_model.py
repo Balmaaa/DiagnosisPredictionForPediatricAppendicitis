@@ -57,11 +57,12 @@ class FeatureEmbedding(nn.Module):
                         embeddings.append(num_embed)
         
         for feat_name in self.categorical_feature_order:
-            feat_values = x_dict[feat_name]
-            cat_embed = self.categorical_embeddings[feat_name](feat_values)
-            cat_embed = cat_embed.unsqueeze(1)
-            cat_embed = cat_embed + self.categorical_token.unsqueeze(0)
-            embeddings.append(cat_embed)
+            if feat_name in x_dict:
+                feat_values = x_dict[feat_name]
+                cat_embed = self.categorical_embeddings[feat_name](feat_values)
+                cat_embed = cat_embed.unsqueeze(1)
+                cat_embed = cat_embed + self.categorical_token.unsqueeze(0)
+                embeddings.append(cat_embed)
         
         if embeddings:
             x = torch.cat(embeddings, dim=1)
@@ -227,12 +228,13 @@ class TransformerTrainer:
         
         return total_loss / len(dataloader), 100 * correct / total, all_predictions, all_targets
     
+
     def calibrate_temperature(self, val_loader):
         self.model.eval()
         nll_criterion = nn.BCEWithLogitsLoss()
-        
         all_logits = []
         all_targets = []
+
         with torch.no_grad():
             for features_dict, targets in val_loader:
                 targets = targets.to(self.device)
@@ -240,22 +242,30 @@ class TransformerTrainer:
                 logits = self.model(features_dict).squeeze(-1)
                 all_logits.append(logits)
                 all_targets.append(targets.float())
-        
+
+        if not all_logits:
+            raise ValueError("Temperature calibration failed: validation loader is empty.")
+
         all_logits = torch.cat(all_logits)
         all_targets = torch.cat(all_targets)
-        
-        temperature = torch.tensor([1.0], requires_grad=True, device=self.device)
-        optimizer = optim.LBFGS([temperature], lr=0.01, max_iter=50)
-        
+        log_temperature = torch.zeros(1, requires_grad=True, device=self.device)
+        optimizer = optim.LBFGS([log_temperature], lr=0.01, max_iter=50)
+
         def eval_loss():
             optimizer.zero_grad()
+            temperature = torch.exp(log_temperature)
             scaled_logits = all_logits / temperature
             loss = nll_criterion(scaled_logits, all_targets)
             loss.backward()
             return loss
-        
+
         optimizer.step(eval_loss)
-        self.temperature = temperature.item()
+        temperature = torch.exp(log_temperature).item()
+
+        if not np.isfinite(temperature) or temperature <= 0:
+            raise ValueError(f"Invalid calibrated temperature: {temperature}")
+
+        self.temperature = temperature
         print(f"[CALIBRATION] Temperature scaled: {self.temperature:.4f}")
         return self.temperature
 
@@ -263,11 +273,12 @@ class TransformerTrainer:
         best_val_loss = float('inf')
         patience_counter = 0
         training_history = []
-        
+        best_model_path = Path(__file__).resolve().parent / "best_advanced_transformer_model.pth"
+
         for epoch in range(epochs):
             train_loss, train_acc = self.train_epoch(train_loader)
             val_loss, val_acc, _, _ = self.evaluate(val_loader, debug=(epoch % 10 == 0))
-            
+
             training_history.append({
                 'epoch': epoch + 1,
                 'train_loss': train_loss,
@@ -275,52 +286,56 @@ class TransformerTrainer:
                 'val_loss': val_loss,
                 'val_acc': val_acc
             })
-            
-            print(f"Epoch {epoch+1}/{epochs}:")
+
+            print(f"Epoch {epoch + 1}/{epochs}:")
             print(f"  Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}%")
             print(f"  Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.2f}%")
-            
+
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 patience_counter = 0
-                torch.save(self.model.state_dict(), "best_advanced_transformer_model.pth")
+                torch.save(self.model.state_dict(), best_model_path)
+                print(f"  [BEST MODEL] Validation loss improved to {best_val_loss:.4f}")
             else:
                 patience_counter += 1
-                
+
             if patience_counter >= patience:
-                print(f"Early stopping at epoch {epoch+1}")
+                print(f"Early stopping at epoch {epoch + 1}")
                 break
-        
+
+        if not best_model_path.exists():
+            raise FileNotFoundError(f"Best Transformer checkpoint not found:\n{best_model_path}")
+
+        self.model.load_state_dict(torch.load(best_model_path, map_location=self.device))
+        print(f"\n[BEST CHECKPOINT RESTORED]\n{best_model_path}")
         print("\n[CALIBRATION] Running temperature scaling...")
         self.calibrate_temperature(val_loader)
-        
+
         return training_history
+
 
 def calculate_medical_metrics(y_true, y_pred):
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
     
     accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, average='binary')
-    sensitivity = recall_score(y_true, y_pred, average='binary')
+    precision = precision_score(y_true, y_pred, average='binary', zero_division=0)
+    sensitivity = recall_score(y_true, y_pred, average='binary', zero_division=0)
     
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    cm = confusion_matrix(y_true, y_pred)
+    if cm.shape == (2, 2):
+        tn, fp, fn, tp = cm.ravel()
+    else:
+        tn, fp, fn, tp = 0, 0, 0, 0
+
     specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
-    
     ppv = tp / (tp + fp) if (tp + fp) > 0 else 0
     npv = tn / (tn + fn) if (tn + fn) > 0 else 0
     
     return {
-        'accuracy': accuracy,
-        'precision': precision,
-        'sensitivity': sensitivity,
-        'specificity': specificity,
-        'ppv': ppv,
-        'npv': npv,
-        'tp': tp,
-        'tn': tn,
-        'fp': fp,
-        'fn': fn
+        'accuracy': accuracy, 'precision': precision, 'sensitivity': sensitivity,
+        'specificity': specificity, 'ppv': ppv, 'npv': npv,
+        'tp': tp, 'tn': tn, 'fp': fp, 'fn': fn
     }
 
 def load_preprocessed_data():
@@ -337,105 +352,74 @@ def load_preprocessed_data():
     y_train = pd.read_csv(PREPROCESS_DIR / "transformer_y_train.csv").squeeze()
     y_val   = pd.read_csv(PREPROCESS_DIR / "transformer_y_val.csv").squeeze()
     y_test = pd.read_csv(PREPROCESS_DIR / "transformer_y_test.csv").squeeze()
-    return(X_train, X_val, X_test, y_train, y_val, y_test, pipeline)
+    return X_train, X_val, X_test, y_train, y_val, y_test, pipeline
 
 def main():    
     print("=" * 80)
     print("ADVANCED TRANSFORMER MODEL FOR PEDIATRIC APPENDICITIS PREDICTION")
-    print("With Feature-Specific Embeddings & Hyperparameter Tuning")
     print("=" * 80)
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
     try:
-        print(f"\n{'='*60}")
-        print("LOADING UNIFIED DATA")
-        print(f"[FAIR COMPARISON - UNIFIED 30 FEATURES]")
-        print(f"{'='*60}")
-        
-        print(f"[FAIR COMPARISON]")
-        print(f"{'='*80}")
-            
-        print(f"\nConverting unified data to Transformer format...")
-        
         X_train, X_val, X_test, y_train, y_val, y_test, pipeline = load_preprocessed_data()
+        
+        feature_info = pipeline["feature_info"]
+        numerical_features = pipeline["numerical_features"]
+        categorical_features = pipeline["categorical_features"]
+        missing_indicators = pipeline.get("missing_indicator_columns", [])
+        
+        # Include missing indicator columns into numerical features so they are processed correctly
+        all_numerical = numerical_features + [col for col in missing_indicators if col in X_train.columns]
+
         X_train_dict = {}
         X_val_dict = {}
         X_test_dict = {}
             
-        NUMERICAL_FEATURES = pipeline["numerical_features"]
-        CATEGORICAL_FEATURES = pipeline["categorical_features"]
-        feature_info = pipeline["feature_info"]
-        feature_order = pipeline["feature_order"]
-        label_encoders = pipeline["label_encoders"]
-        scaler = pipeline["scaler"]
-
-        for feat in CATEGORICAL_FEATURES:
-            X_train_dict[feat] = torch.tensor(X_train[feat].values, dtype=torch.long)
-            X_val_dict[feat] = torch.tensor(X_val[feat].values, dtype=torch.long)
-            X_test_dict[feat] = torch.tensor(X_test[feat].values, dtype=torch.long)
+        for feat in categorical_features:
+            if feat in X_train.columns:
+                X_train_dict[feat] = torch.tensor(X_train[feat].values, dtype=torch.long)
+                X_val_dict[feat] = torch.tensor(X_val[feat].values, dtype=torch.long)
+                X_test_dict[feat] = torch.tensor(X_test[feat].values, dtype=torch.long)
                     
-        X_train_dict["numerical"] = torch.tensor(X_train[NUMERICAL_FEATURES].values, dtype=torch.float32)
-        X_val_dict["numerical"] = torch.tensor(X_val[NUMERICAL_FEATURES].values, dtype=torch.float32)
-        X_test_dict["numerical"] = torch.tensor(X_test[NUMERICAL_FEATURES].values, dtype=torch.float32)
+        X_train_dict["numerical"] = torch.tensor(X_train[all_numerical].values, dtype=torch.float32)
+        X_val_dict["numerical"] = torch.tensor(X_val[all_numerical].values, dtype=torch.float32)
+        X_test_dict["numerical"] = torch.tensor(X_test[all_numerical].values, dtype=torch.float32)
 
-        print(f"Train data shape: {X_train_dict['numerical'].shape}")
-        print(f"Test data shape: {X_test_dict['numerical'].shape}")
-        print(f"Numerical features: {len(NUMERICAL_FEATURES)}")
-        print(f"Categorical features: {len(CATEGORICAL_FEATURES)}")            
-        print(f"Feature info created with {len(feature_info)} features")            
-        print(f"\n{'='*60}")
-        print("USING DEFAULT PARAMETERS FOR FAIR COMPARISON")
-        print(f"[Baseline models already have hyperparameter tuning]")
-        print(f"{'='*60}")
+        print(f"Numerical features (including missing indicators): {len(all_numerical)}")
+        print(f"Categorical features: {len(X_train_dict) - 1}")
             
         y_train_arr = y_train.values if hasattr(y_train, 'values') else np.array(y_train)
         n_negative = int(np.sum(y_train_arr == 0))
         n_positive = int(np.sum(y_train_arr == 1))
-        raw_pw = n_negative / max(n_positive, 1)
-        pos_weight = raw_pw
+        pos_weight = n_negative / max(n_positive, 1)
         print(f"Class distribution - No Appendicitis: {n_negative}, Appendicitis: {n_positive}")
-        print(f"pos_weight for BCEWithLogitsLoss: {pos_weight:.4f} (raw={raw_pw:.4f})")
+        print(f"pos_weight for BCEWithLogitsLoss: {pos_weight:.4f}")
 
         model_params = {'embed_dim': 128, 'num_heads': 8, 'num_layers': 6, 'dropout': 0.2}
         training_params = {'batch_size': 32, 'learning_rate': 0.0005, 'weight_decay': 1e-3}
             
-        print(f"Model parameters: {model_params}")
-        print(f"Training parameters: {training_params}")
-        print(f"\n{'='*60}")
-        print("INITIALIZING MODEL WITH BEST PARAMETERS")
-        print(f"{'='*60}")
-            
-        try:
-            model = AdvancedTabularTransformer(feature_info=feature_info, **model_params)
-        except Exception as e:
-            print(f"Error initializing model: {e}")
-            import traceback
-            traceback.print_exc()
-            raise
-            
-        print(f"Model initialized with parameters: {model_params}")
+        model = AdvancedTabularTransformer(feature_info=feature_info, **model_params)
         print(f"Total parameters: {sum(p.numel() for p in model.parameters()):,}")
             
         train_dataset = AppendicitisDatasetDict(X_train_dict, y_train)
         val_dataset = AppendicitisDatasetDict(X_val_dict, y_val)
         test_dataset = AppendicitisDatasetDict(X_test_dict, y_test)
             
-        train_loader = DataLoader(train_dataset, batch_size=training_params["batch_size"], shuffle=True, pin_memory=torch.cuda.is_available())
-        val_loader = DataLoader(val_dataset, batch_size=training_params["batch_size"], shuffle=False, pin_memory=torch.cuda.is_available())
-        test_loader = DataLoader(test_dataset, batch_size=training_params["batch_size"], shuffle=False, pin_memory=torch.cuda.is_available())
+        train_loader = DataLoader(train_dataset, batch_size=training_params["batch_size"], shuffle=True)
+        val_loader = DataLoader(val_dataset, batch_size=training_params["batch_size"], shuffle=False)
+        test_loader = DataLoader(test_dataset, batch_size=training_params["batch_size"], shuffle=False)
             
         trainer = TransformerTrainer(model, device, pos_weight=pos_weight)
         trainer.optimizer = optim.AdamW(model.parameters(), lr=training_params['learning_rate'], weight_decay=training_params['weight_decay'])
             
         print(f"\nTraining advanced transformer model...")
         training_history = trainer.train(train_loader, val_loader, epochs=100, patience=15)
-            
-        model.load_state_dict(torch.load("best_advanced_transformer_model.pth", map_location=device))            
+
         print(f"\n[FINAL EVALUATION]")
         test_loss, test_acc, predictions, targets = trainer.evaluate(test_loader, debug=True)
-            
+
         metrics = calculate_medical_metrics(targets, predictions)
             
         print(f"\n{'='*80}")
@@ -448,56 +432,25 @@ def main():
         print(f"  Precision: {metrics['precision']:.4f}")
         print(f"  Sensitivity (Recall): {metrics['sensitivity']:.4f}")
         print(f"  Specificity: {metrics['specificity']:.4f}")
-        print(f"  PPV (Positive Predictive Value): {metrics['ppv']:.4f}")
-        print(f"  NPV (Negative Predictive Value): {metrics['npv']:.4f}")
+        print(f"  PPV: {metrics['ppv']:.4f}")
+        print(f"  NPV: {metrics['npv']:.4f}")
         print(f"\nConfusion Matrix:")
         print(f"  True Positives: {metrics['tp']}")
         print(f"  True Negatives: {metrics['tn']}")
         print(f"  False Positives: {metrics['fp']}")
         print(f"  False Negatives: {metrics['fn']}")
             
-        print(f"\nModel Architecture:")
-        print(f"  Embedding Dimension: {model_params['embed_dim']}")
-        print(f"  Number of Heads: {model.num_heads}")
-        print(f"  Number of Layers: {model_params['num_layers']}")
-        print(f"  Dropout: {model_params['dropout']}")
-        print(f"  Learning Rate: {training_params['learning_rate']}")
-            
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        results_file = f"advanced_transformer_results_{timestamp}.pkl"
-            
-        results = {
-            "dataset_name": "Unified",
-            "feature_info": feature_info,
-            "numerical_features": NUMERICAL_FEATURES,
-            "categorical_features": CATEGORICAL_FEATURES,
-            "label_encoders": label_encoders,
-            "scaler": scaler,
-            "training_history": training_history,
-            "final_metrics": metrics,
-            "temperature": trainer.temperature,
-            "model_parameters": model_params,
-            "training_parameters": training_params,
-            "model_state_dict": model.state_dict()
-        }
-            
-        with open(results_file, 'wb') as f:
-            pickle.dump(results, f)
-            
-        print(f"\nResults saved to: {results_file}")
-            
         gui_checkpoint_path = Path(__file__).parent.parent / '09_GUI Application' / 'saved_models' / 'Transformer.pt'
         gui_checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
-        scaler = pipeline["scaler"]
         torch.save({
             "model_state_dict": model.state_dict(),
             "feature_info": feature_info,
             "feature_order": list(feature_info.keys()),
-            "numerical_features": NUMERICAL_FEATURES,
-            "categorical_features": CATEGORICAL_FEATURES,
-            "label_encoders": label_encoders,
-            "scaler": scaler,
+            "numerical_features": all_numerical,
+            "categorical_features": categorical_features,
+            "label_encoders": pipeline["label_encoders"],
+            "scaler": pipeline["scaler"],
             "embed_dim": model_params["embed_dim"],
             "num_heads": model_params["num_heads"],
             "num_layers": model_params["num_layers"],
@@ -506,16 +459,6 @@ def main():
             "pos_weight": pos_weight
         }, gui_checkpoint_path)
         print(f"GUI checkpoint saved to: {gui_checkpoint_path}")
-        
-        print(f"\n{'='*80}")
-        print("ADVANCED TRANSFORMER MODEL TRAINING COMPLETED")
-        print("[OK] Feature-specific embeddings implemented")
-        print("[OK] Multi-feature sequence processing")
-        print("[OK] Model training completed")
-        print("[OK] Proper Transformer architecture")
-        print("[OK] BCEWithLogitsLoss with class weighting")
-        print("[OK] Temperature scaling calibrated")
-        print(f"{'='*80}")
         
     except Exception as e:
         print(f"\nERROR: {e}")

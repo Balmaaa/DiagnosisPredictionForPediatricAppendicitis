@@ -81,8 +81,8 @@ class DecisionTreeModel:
         preds = (probs >= threshold).astype(int)
 
         acc = accuracy_score(y_test, preds)
-        prec = precision_score(y_test, preds)
-        rec = recall_score(y_test, preds)
+        prec = precision_score(y_test, preds, zero_division=0)
+        rec = recall_score(y_test, preds, zero_division=0)
 
         tn, fp, fn, tp = confusion_matrix(y_test, preds).ravel()
 

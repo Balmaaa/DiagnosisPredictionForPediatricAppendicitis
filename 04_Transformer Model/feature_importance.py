@@ -1,6 +1,7 @@
+import sys
+from pathlib import Path
 import copy
 import pickle
-from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -41,7 +42,6 @@ class AppendicitisDatasetDict(Dataset):
 
 def load_pipeline():
     preprocess_dir = (Path(__file__).resolve().parents[1] / "03_Preprocessing Pipeline")
-
     pipeline_files = sorted(preprocess_dir.glob("transformer_pipeline_*.pkl"))
 
     if len(pipeline_files) == 0:
@@ -88,7 +88,8 @@ def dataframe_to_dict(dataframe, numerical_features, categorical_features):
     feature_dict["numerical"] = torch.tensor(dataframe[numerical_features].values, dtype=torch.float32)
 
     for feature in categorical_features:
-        feature_dict[feature] = torch.tensor(dataframe[feature].values, dtype=torch.long)
+        if feature in dataframe.columns:
+            feature_dict[feature] = torch.tensor(dataframe[feature].values, dtype=torch.long)
 
     return feature_dict
 
@@ -114,6 +115,7 @@ def predict(model, feature_dict, device="cpu", batch_size=64):
 
     return np.array(predictions)
 
+
 # ============================================================
 # PERMUTATION FEATURE IMPORTANCE
 # ============================================================
@@ -121,7 +123,7 @@ def predict(model, feature_dict, device="cpu", batch_size=64):
 def permutation_feature_importance(model, X_dict, y_true, feature_names, numerical_features, device="cpu", n_repeats=5):
     print("\nComputing permutation feature importance...")
     baseline_predictions = predict(model, X_dict, device)
-    baseline_recall = recall_score(y_true, baseline_predictions)
+    baseline_recall = recall_score(y_true, baseline_predictions, zero_division=0)
     print(f"Baseline Recall : {baseline_recall:.4f}")
     importance_scores = []
 
@@ -136,23 +138,25 @@ def permutation_feature_importance(model, X_dict, y_true, feature_names, numeric
                 permutation = torch.randperm(shuffled.size(0))
                 shuffled[:, idx] = shuffled[permutation, idx]
                 permuted["numerical"] = shuffled
-
-            ####################################################
-            # Categorical feature
-            ####################################################
-            else:
+            elif feature in permuted:
                 shuffled = permuted[feature].clone()
                 permutation = torch.randperm(shuffled.size(0))
                 shuffled = shuffled[permutation]
                 permuted[feature] = shuffled
+            else:
+                importance_scores.append(0.0)
+                continue
 
             predictions = predict(model, permuted, device)
-            recall = recall_score(y_true, predictions)
+            recall = recall_score(y_true, predictions, zero_division=0)
             scores.append(baseline_recall - recall)
 
-        importance_scores.append(np.mean(scores))
+        if scores:
+            importance_scores.append(np.mean(scores))
+        else:
+            importance_scores.append(0.0)
 
-        print(f"{feature:<35}" f"{importance_scores[-1]:.5f}")
+        print(f"{feature:<35}{importance_scores[-1]:.5f}")
 
     importance_scores = np.array(importance_scores)
     importance_scores[importance_scores < 0] = 0
@@ -168,23 +172,33 @@ def permutation_feature_importance(model, X_dict, y_true, feature_names, numeric
 # ============================================================
 
 def plot_feature_importance(importance, feature_names, top_n=15):
-
+    plt.close('all')
+    
     df = pd.DataFrame({"Feature": feature_names, "Importance": importance})
     df = df.sort_values(by="Importance", ascending=False)
     top_df = df.head(top_n)
-    plt.figure(figsize=(10, 8))
-    plt.barh(top_df["Feature"][::-1], top_df["Importance"][::-1], color="purple")
-    plt.xlabel("Permutation Importance")
-    plt.ylabel("Feature")
-    plt.title("Transformer Feature Importance", fontsize=15, fontweight="bold")
+    
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    bars = ax.barh(top_df["Feature"][::-1], top_df["Importance"][::-1], color="purple")
+    ax.set_xlabel("Permutation Importance")
+    ax.set_ylabel("Feature")
+    ax.set_title("Transformer Feature Importance", fontsize=15, fontweight="bold")
+
+    max_val = top_df["Importance"].max()
+    ax.set_xlim(0, max_val * 1.25)
+    
+    # Adjust y-limits slightly to prevent top labels from colliding with the upper border frame
+    ax.set_ylim(-0.8, len(top_df) - 0.2)
 
     for i, value in enumerate(top_df["Importance"][::-1]):
-        plt.text(value + 0.001, i, f"{value:.3f}", va="center")
+        ax.text(value + (max_val * 0.01), i, f"{value:.3f}", va="center", ha="left", fontsize=9, clip_on=True)
 
-    plt.grid(axis="x", alpha=0.3)
-    plt.tight_layout()
+    ax.grid(axis="x", alpha=0.3)
+    fig.tight_layout()
+    
     output_path = (Path(__file__).parent / "transformer_feature_importance.png")
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
     print(f"\nFigure saved to:\n{output_path}")
     plt.show()
     return df
@@ -195,13 +209,12 @@ def plot_feature_importance(importance, feature_names, top_n=15):
 # ============================================================
 
 def print_ranking(df):
-    print("\n")
-    print("=" * 80)
+    print("\n" + "=" * 80)
     print("TRANSFORMER FEATURE IMPORTANCE")
     print("=" * 80)
 
     for i, row in enumerate(df.itertuples()):
-        print(f"{i+1:2d}. " f"{row.Feature:<35}" f"{row.Importance:.4f}")
+        print(f"{i+1:2d}. {row.Feature:<35}{row.Importance:.4f}")
 
     print("=" * 80)
 
@@ -221,21 +234,27 @@ def main():
     X_test, y_test, pipeline = load_pipeline()
     numerical_features = pipeline["numerical_features"]
     categorical_features = pipeline["categorical_features"]
-    feature_order = pipeline["feature_order"]
-    X_test_dict = dataframe_to_dict(X_test, numerical_features, categorical_features)
+    missing_indicators = pipeline.get("missing_indicator_columns", [])
+    
+    all_numerical = numerical_features + [col for col in missing_indicators if col in X_test.columns]
+    feature_order = all_numerical + categorical_features
+
+    X_test_dict = dataframe_to_dict(X_test, all_numerical, categorical_features)
     model = load_model(device)
+    
     importance = permutation_feature_importance(
         model=model,
         X_dict=X_test_dict,
         y_true=np.array(y_test),
         feature_names=feature_order,
-        numerical_features=numerical_features,
+        numerical_features=all_numerical,
         device=device,
         n_repeats=5
     )
 
     ranking = plot_feature_importance(importance, feature_order, top_n=15)
     print_ranking(ranking)
+    
     csv_path = (Path(__file__).parent / "transformer_feature_importance.csv")
     ranking.to_csv(csv_path, index=False)
     print(f"\nCSV saved to:\n{csv_path}")

@@ -7,9 +7,8 @@ from pathlib import Path
 from datetime import datetime
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import (StandardScaler, OneHotEncoder, LabelEncoder)
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
-from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
 import warnings
 warnings.filterwarnings("ignore")
@@ -68,26 +67,9 @@ LOCATION_MAPPING = {
 }
 
 ORDINAL_MAPPINGS = {
-    "Ketones_in_Urine": {
-        "No": 0,
-        "+": 1,
-        "++": 2,
-        "+++": 3
-    },
-
-    "RBC_in_Urine": {
-        "No": 0,
-        "+": 1,
-        "++": 2,
-        "+++": 3
-    },
-
-    "WBC_in_Urine": {
-        "No": 0,
-        "+": 1,
-        "++": 2,
-        "+++": 3
-    }
+    "Ketones_in_Urine": {"No": 0, "+": 1, "++": 2, "+++": 3},
+    "RBC_in_Urine": {"No": 0, "+": 1, "++": 2, "+++": 3},
+    "WBC_in_Urine": {"No": 0, "+": 1, "++": 2, "+++": 3}
 }
 
 # ============================================================
@@ -102,7 +84,6 @@ def setup_output_files():
     report_path = script_dir / report_name
     pickle_path = script_dir / pickle_name
     report_file = open(report_path, "w", encoding="utf-8")
-
     return report_file, str(report_path), str(pickle_path)
 
 
@@ -150,14 +131,6 @@ def separate_target(df, output_file):
 
     print_save(f"Target Column : {TARGET_COLUMN}", output_file)
     print_save(f"Feature Shape : {X.shape}", output_file)
-    print_save("\nTarget Distribution", output_file)
-
-    counts = y.value_counts(dropna=False)
-
-    for value, count in counts.items():
-        percentage = count / len(y) * 100
-        print_save(f"{value:<20}{count:>6} ({percentage:.2f}%)", output_file)
-
     return X, y
 
 
@@ -171,18 +144,13 @@ def remove_leakage_columns(X, output_file):
     print_save("=" * 60, output_file)
 
     removed = []
-
     for column in LEAKAGE_COLUMNS:
         if column in X.columns:
             X = X.drop(columns=column)
             removed.append(column)
             print_save(f"Removed : {column}", output_file)
 
-    if len(removed) == 0:
-        print_save("No leakage columns detected.", output_file)
-
     print_save(f"\nLeakage Columns Removed : {len(removed)}", output_file)
-
     return X
 
 
@@ -193,21 +161,17 @@ def remove_leakage_columns(X, output_file):
 def normalize_location_string(value):
     if pd.isna(value):
         return value
-
     value = str(value).strip().lower()
     parts = re.split(r'[,;/+]| and ', value)
     parts = [p.strip() for p in parts if p.strip()]
     normalized = []
-
     for part in parts:
         if part == "rechter unter- und mittelbauch":
-            normalized.extend(["Right_Lower_Quadrant", "Right_Mid_Abdomen"])
+            normalized.extend(["right_lower_quadrant", "right_mid_abdomen"])
             continue
-
         normalized.append(LOCATION_MAPPING.get(part, part))
+    return ", ".join(sorted(set(normalized)))
 
-    normalized = sorted(set(normalized))
-    return ", ".join(normalized)
 
 def normalize_categorical_values(df, output_file):
     print_save("\n" + "=" * 60, output_file)
@@ -215,272 +179,103 @@ def normalize_categorical_values(df, output_file):
     print_save("=" * 60, output_file)
 
     categorical_columns = df.select_dtypes(exclude=np.number).columns
-
     replacements = {
-        "yes": "Yes",
-        "y": "Yes",
-        "true": "Yes",
-        "1": "Yes",
-        "ja": "Yes",
-
-        "no": "No",
-        "n": "No",
-        "false": "No",
-        "0": "No",
-        "nein": "No",
-
-        "male": "Male",
-        "m": "Male",
-
-        "female": "Female",
-        "f": "Female"
+        "yes": "Yes", "y": "Yes", "true": "Yes", "1": "Yes", "ja": "Yes",
+        "no": "No", "n": "No", "false": "No", "0": "No", "nein": "No",
+        "male": "Male", "m": "Male", "female": "Female", "f": "Female"
     }
 
     for column in categorical_columns:
-        df[column] = (df[column].where(df[column].isna(), df[column].astype(str)).str.strip().str.lower().replace(replacements))
-
-    # ==========================================
-    # ORDINAL ENCODING
-    # ==========================================
+        df[column] = df[column].where(df[column].isna(), df[column].astype(str)).str.strip().str.lower().replace(replacements)
 
     for column, mapping in ORDINAL_MAPPINGS.items():
         if column in df.columns:
-            df[column] = (df[column].replace(mapping).astype(float))
+            df[column] = df[column].replace(mapping).astype(float)
 
-    print_save("\nORDINAL COLUMN TYPES", output_file)
-
-    for col in ORDINAL_MAPPINGS.keys():
-        if col in df.columns:
-            print_save(f"{col}: {df[col].dtype}", output_file)
-
-    if "Lymph_Nodes_Location" in df.columns:
-        print_save(f"Unique locations BEFORE normalization: {df['Lymph_Nodes_Location'].nunique(dropna=True)}", output_file)
-        df["Lymph_Nodes_Location"] = (df["Lymph_Nodes_Location"].apply(normalize_location_string))
-        counts = df["Lymph_Nodes_Location"].value_counts()
-        rare_categories = counts[counts < 10].index
-        df["Lymph_Nodes_Location"] = (df["Lymph_Nodes_Location"].replace(rare_categories, "Other"))
-        print_save(f"Unique locations AFTER normalization: {df['Lymph_Nodes_Location'].nunique(dropna=True)}", output_file)
-
-    if "Abscess_Location" in df.columns:
-        print_save(f"Unique abscess locations BEFORE normalization: {df['Abscess_Location'].nunique(dropna=True)}", output_file)
-        df["Abscess_Location"] = (df["Abscess_Location"].apply(normalize_location_string))
-        counts = df["Abscess_Location"].value_counts()
-        rare_categories = counts[counts < 10].index
-        df["Abscess_Location"] = (df["Abscess_Location"].replace(rare_categories, "Other"))
-        print_save(f"Unique abscess locations AFTER normalization: {df['Abscess_Location'].nunique(dropna=True)}", output_file)
+    for loc_col in ["Lymph_Nodes_Location", "Abscess_Location"]:
+        if loc_col in df.columns:
+            df[loc_col] = df[loc_col].apply(normalize_location_string)
 
     print_save("Categorical values normalized.", output_file)
-
     return df
 
-# ============================================================
-# IDENTIFY FEATURE TYPES
-# ============================================================
-
-def identify_column_types(X, output_file):
-    print_save("\n" + "=" * 60, output_file)
-    print_save("FEATURE TYPE IDENTIFICATION", output_file)
-    print_save("=" * 60, output_file)
-
-    numeric_columns = (X.select_dtypes(include=np.number).columns.tolist())
-    categorical_columns = (X.select_dtypes(exclude=np.number).columns.tolist())
-
-    print_save(f"Numeric Features : {len(numeric_columns)}", output_file)
-
-    for column in numeric_columns:
-        print_save(f"   {column}", output_file)
-
-    print_save(f"\nCategorical Features : {len(categorical_columns)}", output_file)
-
-    for column in categorical_columns:
-        print_save(f"   {column}", output_file)
-
-    return numeric_columns, categorical_columns
-
 
 # ============================================================
-# CREATE PREPROCESSOR
-# ============================================================
-
-def create_preprocessor(numeric_columns, categorical_columns, output_file):
-    print_save("\n" + "=" * 60, output_file)
-    print_save("BUILDING PREPROCESSING PIPELINE", output_file)
-    print_save("=" * 60, output_file)
-
-    numeric_pipeline = Pipeline(steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())])
-    categorical_pipeline = Pipeline(steps=[("imputer", SimpleImputer(strategy="constant", fill_value="Unknown")), ("encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False))])
-    preprocessor = ColumnTransformer(transformers=[("numeric", numeric_pipeline, numeric_columns), ("categorical", categorical_pipeline, categorical_columns)], remainder="drop")
-
-    print_save("Preprocessing pipeline successfully created.", output_file)
-
-    return preprocessor
-
-
-# ============================================================
-# DATA PREPROCESSING
+# DATA PREPROCESSING PIPELINE
 # ============================================================
 
 def preprocess_dataset(df, output_file):
-
     print_save("\n" + "=" * 60, output_file)
     print_save("DATA PREPROCESSING", output_file)
     print_save("=" * 60, output_file)
 
-    print_save(f"Original Dataset Shape : {df.shape}", output_file)
-
-    # ----------------------------------------------------
-    # Remove samples with missing target
-    # ----------------------------------------------------
-
-    missing_target = df[TARGET_COLUMN].isna().sum()
-
-    if missing_target > 0:
-        print_save(f"Removing {missing_target} samples with missing target values.", output_file)
+    if df[TARGET_COLUMN].isna().sum() > 0:
         df = df.dropna(subset=[TARGET_COLUMN]).reset_index(drop=True)
 
-    print_save(f"Dataset Shape After Target Cleaning : {df.shape}", output_file)
-
-    # ---------------------------------------
-    # Separate target
-    # ---------------------------------------
-
     X, y = separate_target(df, output_file)
-
-    # ---------------------------------------
-    # Remove leakage variables
-    # ---------------------------------------
-
     X = remove_leakage_columns(X, output_file)
     
-    if "Source_Dataset" in X.columns:
-        X = X.drop(columns=["Source_Dataset"])
-
-    if "US_Number" in X.columns:
-        X = X.drop(columns=["US_Number"])
+    for extra_drop in ["Source_Dataset", "US_Number"]:
+        if extra_drop in X.columns:
+            X = X.drop(columns=[extra_drop])
 
     X = normalize_categorical_values(X, output_file)
 
-    if "Lymph_Nodes_Location" in X.columns:
-        print_save("\nNORMALIZED LYMPH NODE LOCATIONS", output_file)
-        print_save(str(X["Lymph_Nodes_Location"].value_counts(dropna=False)), output_file)
-
-    # ---------------------------------------
-    # Report
-    # ---------------------------------------
-
-    print_save("\n" + "=" * 60, output_file)
-    print_save("CATEGORICAL CARDINALITY REPORT", output_file)
-    print_save("=" * 60, output_file)
-
-    categorical_columns = X.select_dtypes(exclude=np.number).columns
-
-    for col in categorical_columns:
-
-        print_save("\n" + "=" * 70, output_file)
-        print_save(f"Feature : {col}", output_file)
-        print_save("=" * 70, output_file)
-
-        unique_values = X[col].value_counts(dropna=False)
-
-        print_save(f"Number of Unique Categories : {len(unique_values)}", output_file)
-        print_save("", output_file)
-        print_save("Categories:", output_file)
-        print_save("-" * 70, output_file)
-        print_save(f"{'Category':<45}{'Count':>10}", output_file)
-        print_save("-" * 70, output_file)
-
-        for value, count in unique_values.items():
-
-            if pd.isna(value):
-                value = "<Missing>"
-
-            print_save(f"{str(value):<45}{count:>10}", output_file)
-
-        print_save("-" * 70, output_file)
-
-    # ---------------------------------------
-    # Identify feature types
-    # ---------------------------------------
-
-    for col in X.columns:
-        missing_rate = X[col].isnull().mean()
-        if missing_rate >= 0.05:
-            X[f"{col}_Missing"] = X[col].isnull().astype(int)
-
-    numeric_columns, categorical_columns = identify_column_types(X, output_file)
-
-    print_save("\nCreating Train/Test Split...", output_file)
+    # Stratified Split
     split = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=RANDOM_STATE)
     for train_idx, test_idx in split.split(X, y):
-        X_train = X.iloc[train_idx]
-        X_test = X.iloc[test_idx]
-        y_train = y.iloc[train_idx]
-        y_test = y.iloc[test_idx]
+        X_train = X.iloc[train_idx].copy()
+        X_test = X.iloc[test_idx].copy()
+        y_train = y.iloc[train_idx].copy()
+        y_test = y.iloc[test_idx].copy()
 
-    print_save(f"Train Shape : {X_train.shape}", output_file)
-    print_save(f"Test Shape : {X_test.shape}", output_file)
+    # Group Rare Locations Using Training Data Only
+    for col in ["Lymph_Nodes_Location", "Abscess_Location"]:
+        if col in X_train.columns:
+            counts = X_train[col].value_counts(dropna=True)
+            common_categories = counts[counts >= 10].index
+            X_train[col] = X_train[col].where(X_train[col].isna() | X_train[col].isin(common_categories), "Other")
+            X_test[col] = X_test[col].where(X_test[col].isna() | X_test[col].isin(common_categories), "Other")
 
-    # ---------------------------------------
-    # Create preprocessing object
-    # ---------------------------------------
+    # Fixed Missing Indicators based strictly on Training set criteria to guarantee schema alignment
+    missing_indicator_columns = [col for col in X_train.columns if X_train[col].isnull().mean() >= 0.05]
+    for col in missing_indicator_columns:
+        indicator = f"{col}_Missing"
+        X_train[indicator] = X_train[col].isnull().astype(int)
+        X_test[indicator] = X_test[col].isnull().astype(int)
 
-    preprocessor = create_preprocessor(numeric_columns, categorical_columns, output_file)
+    print_save(f"Missing Indicators Created: {len(missing_indicator_columns)}", output_file)
 
-    print_save("\nFitting preprocessing pipeline...", output_file)
+    numeric_columns = X_train.select_dtypes(include=np.number).columns.tolist()
+    categorical_columns = X_train.select_dtypes(exclude=np.number).columns.tolist()
+
+    # Preprocessing Column Transformer
+    numeric_pipeline = Pipeline(steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())])
+    categorical_pipeline = Pipeline(steps=[("imputer", SimpleImputer(strategy="constant", fill_value="Unknown")), ("encoder", OneHotEncoder(handle_unknown="ignore", sparse_output=False))])
+    preprocessor = ColumnTransformer(transformers=[("numeric", numeric_pipeline, numeric_columns), ("categorical", categorical_pipeline, categorical_columns)], remainder="drop")
 
     X_train_processed = preprocessor.fit_transform(X_train)
     X_test_processed = preprocessor.transform(X_test)
 
-    print_save(f"Processed Shape : {X_train_processed.shape}", output_file)
-
-    # ---------------------------------------
-    # Recover feature names
-    # ---------------------------------------
-
-    feature_names = []
-
-    feature_names.extend(numeric_columns)
-
+    # Recover feature names cleanly
+    feature_names = numeric_columns.copy()
     if len(categorical_columns) > 0:
-        encoder = (preprocessor.named_transformers_["categorical"].named_steps["encoder"])
-        encoded_names = encoder.get_feature_names_out(categorical_columns)
-        feature_names.extend(encoded_names.tolist())
-        print_save("\nORDINAL FEATURE CHECK", output_file)
-        for feature in feature_names:
-            if ("Ketones" in feature or "RBC_in_Urine" in feature or "WBC_in_Urine" in feature):
-                print_save(feature, output_file)
+        encoder = preprocessor.named_transformers_["categorical"].named_steps["encoder"]
+        feature_names.extend(encoder.get_feature_names_out(categorical_columns).tolist())
 
     X_train_processed = pd.DataFrame(X_train_processed, columns=feature_names)
     X_test_processed = pd.DataFrame(X_test_processed, columns=feature_names)
 
-    print_save(f"\nFeature Reduction Summary", output_file)
-    print_save(f"Original Features : {df.shape[1]-1}", output_file)
-    print_save(f"Features After Leakage Removal : {X.shape[1]}", output_file)
-    print_save(f"Encoded Features : {X_train_processed.shape[1]}", output_file)
-    print_save(f"Final Feature Count : {len(feature_names)}", output_file)
-
-    # ---------------------------------------
     # Encode target
-    # ---------------------------------------
+    label_encoder = {"no appendicitis": 0, "appendicitis": 1}
+    y_train_encoded = pd.Series(y_train.astype(str).str.strip().str.lower().map(label_encoder), name=TARGET_COLUMN, dtype=int)
+    y_test_encoded = pd.Series(y_test.astype(str).str.strip().str.lower().map(label_encoder), name=TARGET_COLUMN, dtype=int)
 
-    label_encoder = LabelEncoder()
-    y_train_encoded = label_encoder.fit_transform(y_train)
-    y_test_encoded = label_encoder.transform(y_test)
-    y_train_encoded = pd.Series(y_train_encoded, name=TARGET_COLUMN)
-    y_test_encoded = pd.Series(y_test_encoded, name=TARGET_COLUMN)
-    print_save("\nTarget Encoding", output_file)
-
-    for original, encoded in zip(label_encoder.classes_, range(len(label_encoder.classes_))):
-        print_save(f"{original} -> {encoded}", output_file)
-
-    missing = (X_train_processed.isnull().sum().sum() + X_test_processed.isnull().sum().sum())
-    print_save(f"\nRemaining Missing Values : {missing}", output_file)
-
-    return (X_train_processed, X_test_processed, y_train_encoded, y_test_encoded, preprocessor, label_encoder, feature_names)
+    return X_train_processed, X_test_processed, y_train_encoded, y_test_encoded, preprocessor, label_encoder, feature_names
 
 
 # ============================================================
-# SAVE OUTPUTS
+# SAVE OUTPUTS & MAIN
 # ============================================================
 
 def save_outputs(X_train, X_test, y_train, y_test, preprocessor, label_encoder, feature_names, pickle_path, output_file):
@@ -493,61 +288,31 @@ def save_outputs(X_train, X_test, y_train, y_test, preprocessor, label_encoder, 
     pipeline_data = {"preprocessor": preprocessor, "label_encoder": label_encoder, "feature_names": feature_names}
     with open(pickle_path, "wb") as f:
         pickle.dump(pipeline_data, f)
-    
     print_save(f"Saved preprocessing pipeline:\n{pickle_path}", output_file)
 
-# ============================================================
-# MAIN
-# ============================================================
 
 def main():
-    global output_file
-
     output_file, report_path, pickle_path = setup_output_files()
-
     print_save("=" * 60, output_file)
-    print_save("DATA PREPROCESSING PIPELINE", output_file)
-    print_save("=" * 60, output_file)
-    print_save("Preparing integrated dataset for machine learning", output_file)
+    print_save("DATA PREPROCESSING PIPELINE (HARDENED)", output_file)
     print_save("=" * 60, output_file)
 
     dataset = load_dataset(output_file)
-
     if dataset is None:
-        print_save("\n[ERROR] Unable to continue preprocessing.", output_file)
         output_file.close()
-        print(f"\nReport saved to : {report_path}")
         return
 
     try:
-        (X_train, X_test, y_train, y_test, preprocessor, label_encoder, feature_names) = preprocess_dataset(dataset, output_file)
+        X_train, X_test, y_train, y_test, preprocessor, label_encoder, feature_names = preprocess_dataset(dataset, output_file)
         save_outputs(X_train, X_test, y_train, y_test, preprocessor, label_encoder, feature_names, pickle_path, output_file)
-
-        print_save("\n" + "=" * 60, output_file)
-        print_save("PREPROCESSING SUMMARY", output_file)
-        print_save("=" * 60, output_file)
-
-        print_save(f"Original Samples : {len(dataset)}", output_file)
-        print_save(f"Processed Samples : {len(X_train) + len(X_test)}", output_file)
-        print_save(f"Final Features : {X_train.shape[1]}", output_file)
-        print_save(f"Target Column : {TARGET_COLUMN}", output_file)
-        print_save(f"Leakage Columns Removed : {len(LEAKAGE_COLUMNS)}", output_file)
-
-        for column in LEAKAGE_COLUMNS:
-            print_save(f"   • {column}", output_file)
-
-        print_save("\n" + "=" * 60, output_file)
-        print_save("DATA PREPROCESSING COMPLETED SUCCESSFULLY", output_file)
-        print_save("=" * 60, output_file)
-
+        print_save("\nPreprocessing Completed Successfully.", output_file)
     except Exception as e:
         print_save(f"\nPREPROCESSING FAILED : {e}", output_file)
         print_save(traceback.format_exc(), output_file)
-
-    output_file.close()
-    print(f"\nReport saved to : {report_path}")
+    finally:
+        output_file.close()
+        print(f"\nReport saved to : {report_path}")
 
 
 if __name__ == "__main__":
-
     main()

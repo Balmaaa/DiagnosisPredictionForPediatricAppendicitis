@@ -293,6 +293,51 @@ def exclude_high_missing_and_specialty_columns(columns, df, dataset_name, output
 
     return remaining, excluded
 
+# ============================================================
+# PREDICTOR LEAKAGE ANALYSIS
+# ============================================================
+
+def analyze_predictor_leakage(df, target_column, output_file):
+
+    print_save("\n" + "=" * 60, output_file)
+    print_save("PREDICTOR LEAKAGE ANALYSIS - Integrated Dataset", output_file)
+    print_save("=" * 60, output_file)
+
+    if target_column not in df.columns:
+        raise ValueError(f"Target column '{target_column}' does not exist in the dataset.")
+
+    explicit_exclusions = {
+        "Patient_Record_ID": "Identifier variable",
+        "Source_Dataset": "Source variable",
+        "Diagnosis_Presumptive": "Preliminary diagnosis variable",
+        "Length_of_Stay": "Outcome-derived variable",
+        "Management": "Outcome-derived variable",
+        "Severity": "Outcome-related variable",
+        "Alvarado_Score": "Clinical scoring system",
+        "Paedriatic_Appendicitis_Score": "Clinical scoring system",
+        "US_Number": "Excluded control variable",
+        "Gynecological_Findings": "Specialty-specific variable"
+    }
+
+    leakage_columns = []
+
+    for column, reason in explicit_exclusions.items():
+        if column in df.columns:
+            leakage_columns.append(column)
+            print_save(f"EXCLUDED : {column} ({reason})", output_file)
+
+    leakage_columns = sorted(set(leakage_columns))
+
+    if target_column in leakage_columns:
+        raise ValueError(f"Target column '{target_column}' was incorrectly " "included in the predictor-exclusion list.")
+
+    print_save(f"\nTotal Predictor Leakage/Exclusion Columns : " f"{len(leakage_columns)}", output_file)
+    print_save("\nFinal Predictor Exclusion List", output_file)
+
+    for column in leakage_columns:
+        print_save(f"   {column}", output_file)
+
+    return leakage_columns
 
 # ============================================================
 # TARGET VALIDATION
@@ -343,6 +388,11 @@ def main():
     if len(candidates) == 0:
         print_save("No diagnosis columns detected.", output_file)
     else:
+
+        # --------------------------------------------------------
+        # TARGET IDENTIFICATION
+        # --------------------------------------------------------
+
         remaining, excluded = exclude_presumptive_diagnoses(candidates, "Integrated Dataset", output_file)
         remaining, excluded = exclude_outcome_derived_variables(remaining, "Integrated Dataset", output_file)
         remaining, excluded = exclude_scoring_systems(remaining, "Integrated Dataset", output_file)
@@ -350,18 +400,27 @@ def main():
 
         try:
             target_column = validate_single_target(remaining, "Integrated Dataset", output_file)
+
+            # ----------------------------------------------------
+            # PREDICTOR LEAKAGE ANALYSIS
+            # ----------------------------------------------------
+
+            predictor_leakage_columns = analyze_predictor_leakage(dataset, target_column, output_file)
+
             print_save("\n" + "=" * 60, output_file)
             print_save("FINAL TARGET SUMMARY", output_file)
             print_save("=" * 60, output_file)
             print_save(f"Final Target Column : {target_column}", output_file)
             print_save("Target Leakage Status : PASSED", output_file)
-            print_save("\nThe following columns were successfully excluded "    "from being considered as prediction targets:", output_file)
+            print_save("\nThe following columns were identified as " "unsuitable prediction targets or predictors:", output_file)
             print_save("• Presumptive diagnosis variables", output_file)
             print_save("• Outcome-derived variables", output_file)
             print_save("• Clinical scoring systems", output_file)
             print_save("• Specialty-specific diagnosis variables", output_file)
+            print_save("• Identifier/source variables", output_file)
             print_save("\nSelected Machine Learning Target", output_file)
             print_save(f"    {target_column}", output_file)
+            print_save("\nTotal Predictor Leakage/Exclusion Columns : " f"{len(predictor_leakage_columns)}", output_file)
             print_save("\nRemaining dataset columns will be treated as " "candidate predictor variables during preprocessing.", output_file)
 
         except ValueError as error:
@@ -372,15 +431,10 @@ def main():
             print_save("\nManual inspection is required before continuing " "to preprocessing.", output_file)
 
     print_save("\n" + "=" * 60, output_file)
-
     print_save("TARGET & LEAKAGE CONTROL COMPLETED", output_file)
-
     print_save("=" * 60, output_file)
-
     output_file.close()
-
     print(f"\nReport saved to: {report_path}")
-
 
 if __name__ == "__main__":
     main()

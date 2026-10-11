@@ -1,2 +1,2 @@
-dataset1_rows,dataset2_rows,duplicates,unique_dataset1,unique_dataset2,projected_rows
-782,782,2,780,780,1562
+dataset_source,dataset_path,dataset_rows,dataset_columns,duplicate_rows,missing_target_values,target_distribution,generated_at
+Dataset 1,C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\Dataset 1\app_data.csv,782,58,0,2,"{'appendicitis': 463, 'no appendicitis': 317}",2026-10-11T02:57:07.885291

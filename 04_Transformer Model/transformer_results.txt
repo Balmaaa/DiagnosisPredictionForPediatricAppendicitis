@@ -1,0 +1,146 @@
+================================================================================
+ADVANCED TRANSFORMER MODEL FOR PEDIATRIC APPENDICITIS PREDICTION
+================================================================================
+Using device: cpu
+Numerical features (including missing indicators): 69
+Categorical features: 32
+Class distribution - No Appendicitis: 203, Appendicitis: 296
+pos_weight for BCEWithLogitsLoss: 0.6858
+Total parameters: 1,240,321
+[BCEWithLogitsLoss] pos_weight=0.6858
+
+Training advanced transformer model...
+  [DEBUG] Logits - min:0.2623 max:0.3159 mean:0.2838 std:0.0097
+  [DEBUG] Probs  - min:0.5652 max:0.5783 mean:0.5705 std:0.0024
+Epoch 1/100:
+  Train Loss: 0.6384, Train Acc: 48.50%
+  Val Loss: 0.5718, Val Acc: 59.20%
+  [BEST MODEL] Validation loss improved to 0.5718
+Epoch 2/100:
+  Train Loss: 0.5658, Train Acc: 50.70%
+  Val Loss: 0.5585, Val Acc: 41.60%
+  [BEST MODEL] Validation loss improved to 0.5585
+Epoch 3/100:
+  Train Loss: 0.5750, Train Acc: 52.71%
+  Val Loss: 0.5243, Val Acc: 80.00%
+  [BEST MODEL] Validation loss improved to 0.5243
+Epoch 4/100:
+  Train Loss: 0.4520, Train Acc: 76.35%
+  Val Loss: 0.3213, Val Acc: 83.20%
+  [BEST MODEL] Validation loss improved to 0.3213
+Epoch 5/100:
+  Train Loss: 0.3460, Train Acc: 85.37%
+  Val Loss: 0.3217, Val Acc: 88.80%
+Epoch 6/100:
+  Train Loss: 0.2983, Train Acc: 85.57%
+  Val Loss: 0.2105, Val Acc: 92.00%
+  [BEST MODEL] Validation loss improved to 0.2105
+Epoch 7/100:
+  Train Loss: 0.2711, Train Acc: 88.78%
+  Val Loss: 0.2605, Val Acc: 93.60%
+Epoch 8/100:
+  Train Loss: 0.2316, Train Acc: 92.18%
+  Val Loss: 0.2030, Val Acc: 89.60%
+  [BEST MODEL] Validation loss improved to 0.2030
+Epoch 9/100:
+  Train Loss: 0.1799, Train Acc: 91.78%
+  Val Loss: 0.1669, Val Acc: 94.40%
+  [BEST MODEL] Validation loss improved to 0.1669
+Epoch 10/100:
+  Train Loss: 0.1652, Train Acc: 92.18%
+  Val Loss: 0.1525, Val Acc: 92.00%
+  [BEST MODEL] Validation loss improved to 0.1525
+  [DEBUG] Logits - min:-3.9706 max:6.3357 mean:1.8507 std:4.4438
+  [DEBUG] Probs  - min:0.0185 max:0.9982 mean:0.6009 std:0.4553
+Epoch 11/100:
+  Train Loss: 0.1515, Train Acc: 93.99%
+  Val Loss: 0.1734, Val Acc: 93.60%
+Epoch 12/100:
+  Train Loss: 0.1623, Train Acc: 93.79%
+  Val Loss: 0.1989, Val Acc: 96.80%
+Epoch 13/100:
+  Train Loss: 0.2304, Train Acc: 92.38%
+  Val Loss: 0.1827, Val Acc: 96.00%
+Epoch 14/100:
+  Train Loss: 0.1516, Train Acc: 93.79%
+  Val Loss: 0.1254, Val Acc: 93.60%
+  [BEST MODEL] Validation loss improved to 0.1254
+Epoch 15/100:
+  Train Loss: 0.1455, Train Acc: 93.79%
+  Val Loss: 0.2002, Val Acc: 94.40%
+Epoch 16/100:
+  Train Loss: 0.0966, Train Acc: 96.39%
+  Val Loss: 0.2753, Val Acc: 95.20%
+Epoch 17/100:
+  Train Loss: 0.1159, Train Acc: 95.59%
+  Val Loss: 0.2003, Val Acc: 94.40%
+Epoch 18/100:
+  Train Loss: 0.1111, Train Acc: 95.19%
+  Val Loss: 0.2345, Val Acc: 90.40%
+Epoch 19/100:
+  Train Loss: 0.1319, Train Acc: 93.59%
+  Val Loss: 0.1868, Val Acc: 96.00%
+Epoch 20/100:
+  Train Loss: 0.1117, Train Acc: 94.59%
+  Val Loss: 0.1834, Val Acc: 96.00%
+  [DEBUG] Logits - min:-4.6539 max:7.7579 mean:2.9423 std:5.4841
+  [DEBUG] Probs  - min:0.0094 max:0.9996 mean:0.6447 std:0.4654
+Epoch 21/100:
+  Train Loss: 0.0705, Train Acc: 97.60%
+  Val Loss: 0.3681, Val Acc: 92.80%
+Epoch 22/100:
+  Train Loss: 0.1417, Train Acc: 94.19%
+  Val Loss: 0.2819, Val Acc: 95.20%
+Epoch 23/100:
+  Train Loss: 0.0893, Train Acc: 96.99%
+  Val Loss: 0.2278, Val Acc: 96.00%
+Epoch 24/100:
+  Train Loss: 0.0949, Train Acc: 96.59%
+  Val Loss: 0.2617, Val Acc: 94.40%
+Epoch 25/100:
+  Train Loss: 0.0713, Train Acc: 97.39%
+  Val Loss: 0.2161, Val Acc: 91.20%
+Epoch 26/100:
+  Train Loss: 0.1327, Train Acc: 97.19%
+  Val Loss: 0.2780, Val Acc: 95.20%
+Epoch 27/100:
+  Train Loss: 0.1247, Train Acc: 95.79%
+  Val Loss: 0.2805, Val Acc: 91.20%
+Epoch 28/100:
+  Train Loss: 0.0642, Train Acc: 97.60%
+  Val Loss: 0.1954, Val Acc: 94.40%
+Epoch 29/100:
+  Train Loss: 0.0543, Train Acc: 98.20%
+  Val Loss: 0.3134, Val Acc: 92.80%
+Early stopping at epoch 29
+
+[BEST CHECKPOINT RESTORED]
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\04_Transformer Model\best_advanced_transformer_model.pth
+
+[CALIBRATION] Running temperature scaling...
+[CALIBRATION] Temperature scaled: 0.9207
+
+[FINAL EVALUATION]
+  [DEBUG] Logits - min:-4.2359 max:5.0694 mean:0.5032 std:3.2836
+  [DEBUG] Probs  - min:0.0099 max:0.9960 mean:0.5780 std:0.4179
+
+================================================================================
+FINAL RESULTS
+================================================================================
+Test Accuracy: 88.46%
+Test Loss: 0.2260
+
+Medical Metrics:
+  Accuracy: 0.8846
+  Precision: 0.8713
+  Sensitivity (Recall): 0.9462
+  Specificity: 0.7937
+  PPV: 0.8713
+  NPV: 0.9091
+
+Confusion Matrix:
+  True Positives: 88
+  True Negatives: 50
+  False Positives: 13
+  False Negatives: 5
+GUI checkpoint saved to: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\Transformer.pt

@@ -1,0 +1,126 @@
+============================================================
+DATASET INTEGRATION - DATASET 1 ONLY
+============================================================
+
+Loading primary dataset...
+[OK] Dataset 1 loaded : C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\Dataset 1\app_data.csv
+Dataset 1 Shape : (782, 58)
+
+============================================================
+DATA CLEANING SUMMARY
+============================================================
+Records after cleaning : 782
+Columns after cleaning : 58
+
+============================================================
+DATASET VALIDATION
+============================================================
+Dataset Columns : 58
+[OK] Column names are unique.
+Target Column : Diagnosis
+Missing Target Values : 2
+[WARNING] Records with missing target values will require handling downstream.
+Observed Target Categories : 2
+   appendicitis
+   no appendicitis
+Total Records : 782
+Exact Duplicate Rows : 0
+[OK] No exact duplicate rows detected.
+
+[OK] Dataset validation passed.
+
+============================================================
+DATASET STATISTICS
+============================================================
+Dataset Records : 782
+Dataset Features : 58
+Exact Duplicate Rows : 0
+Missing Diagnosis Values : 2
+
+Diagnosis Distribution
+appendicitis                463 (59.36%)
+no appendicitis             317 (40.64%)
+
+============================================================
+FINAL DATASET PREPARATION
+============================================================
+Patient IDs generated : 782
+Dataset source : Dataset 1 only
+Dataset organization completed.
+
+============================================================
+FINAL DATA QUALITY
+============================================================
+
+Rows : 782
+Columns : 60
+Duplicate Rows : 0
+Columns with Missing Values : 58
+
+Missing Value Summary
+Age                                     1 (0.13%)
+BMI                                    27 (3.45%)
+Sex                                     2 (0.26%)
+Height                                 26 (3.32%)
+Weight                                  3 (0.38%)
+Length_of_Stay                          4 (0.51%)
+Management                              1 (0.13%)
+Severity                                1 (0.13%)
+Diagnosis_Presumptive                   2 (0.26%)
+Diagnosis                               2 (0.26%)
+Alvarado_Score                         52 (6.65%)
+Paedriatic_Appendicitis_Score          52 (6.65%)
+Appendix_on_US                          5 (0.64%)
+Appendix_Diameter                     284 (36.32%)
+Migratory_Pain                          9 (1.15%)
+Lower_Right_Abd_Pain                    8 (1.02%)
+Contralateral_Rebound_Tenderness       15 (1.92%)
+Coughing_Pain                          16 (2.05%)
+Nausea                                  8 (1.02%)
+Loss_of_Appetite                       10 (1.28%)
+Body_Temperature                        7 (0.90%)
+WBC_Count                               6 (0.77%)
+Neutrophil_Percentage                 103 (13.17%)
+Segmented_Neutrophils                 728 (93.09%)
+Neutrophilia                           50 (6.39%)
+RBC_Count                              18 (2.30%)
+Hemoglobin                             18 (2.30%)
+RDW                                    26 (3.32%)
+Thrombocyte_Count                      18 (2.30%)
+Ketones_in_Urine                      200 (25.58%)
+RBC_in_Urine                          206 (26.34%)
+WBC_in_Urine                          199 (25.45%)
+CRP                                    11 (1.41%)
+Dysuria                                29 (3.71%)
+Stool                                  17 (2.17%)
+Peritonitis                             9 (1.15%)
+Psoas_Sign                             37 (4.73%)
+Ipsilateral_Rebound_Tenderness        163 (20.84%)
+US_Performed                            4 (0.51%)
+US_Number                              22 (2.81%)
+Free_Fluids                            63 (8.06%)
+Appendix_Wall_Layers                  564 (72.12%)
+Target_Sign                           644 (82.35%)
+Appendicolith                         713 (91.18%)
+Perfusion                             719 (91.94%)
+Perforation                           701 (89.64%)
+Surrounding_Tissue_Reaction           530 (67.77%)
+Appendicular_Abscess                  697 (89.13%)
+Abscess_Location                      769 (98.34%)
+Pathological_Lymph_Nodes              579 (74.04%)
+Lymph_Nodes_Location                  661 (84.53%)
+Bowel_Wall_Thickening                 683 (87.34%)
+Conglomerate_of_Bowel_Loops           739 (94.50%)
+Ileus                                 722 (92.33%)
+Coprostasis                           711 (90.92%)
+Meteorism                             642 (82.10%)
+Enteritis                             716 (91.56%)
+Gynecological_Findings                756 (96.68%)
+
+============================================================
+SAVING OUTPUT FILES
+============================================================
+Saved : merged_dataset.csv
+All integration files saved successfully.
+
+Dataset integration completed successfully.

@@ -1,0 +1,42 @@
+============================================================
+DATA PREPROCESSING PIPELINE (HARDENED)
+============================================================
+[OK] Successfully loaded integrated dataset:
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\00_Dataset Integration\merged_dataset.csv
+Dataset Shape : (782, 60)
+
+============================================================
+DATA PREPROCESSING
+============================================================
+
+============================================================
+TARGET SEPARATION
+============================================================
+Target Column : Diagnosis
+Feature Shape : (780, 59)
+
+============================================================
+REMOVING LEAKAGE FEATURES
+============================================================
+Removed : Diagnosis_Presumptive
+Removed : Gynecological_Findings
+Removed : Management
+Removed : Length_of_Stay
+Removed : Alvarado_Score
+Removed : Paedriatic_Appendicitis_Score
+Removed : Patient_Record_ID
+Removed : Source_Dataset
+Removed : Severity
+Removed : US_Number
+
+Leakage Columns Removed : 10
+
+============================================================
+NORMALIZING CATEGORICAL VARIABLES
+============================================================
+Categorical values normalized.
+Missing Indicators Created: 25
+Saved preprocessing pipeline:
+C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\03_Preprocessing Pipeline\preprocessing_pipeline_20261011_030007.pkl
+
+Preprocessing Completed Successfully.

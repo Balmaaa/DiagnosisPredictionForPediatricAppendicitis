@@ -9,7 +9,7 @@ C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis 
 ============================================================
 DATASET : Integrated Dataset
 ============================================================
-Shape : 1562 rows x 60 columns
+Shape : 782 rows x 60 columns
 
 Column Names (60 total)
  1. Patient_Record_ID
@@ -142,13 +142,12 @@ Gynecological_Findings                   object
 ============================================================
 DATASET INTEGRITY
 ============================================================
-Total Patient IDs : 1562
+Total Patient IDs : 782
 Duplicate Patient IDs : 0
 [OK] Patient_Record_ID values are unique.
 
 Source Dataset Distribution
-Newer_Cohort         782
-Older_Cohort         780
+Dataset_1            782
 
 Duplicate Rows : 0
 Duplicate Records (excluding Patient_Record_ID) : 0
@@ -222,77 +221,83 @@ Gynecological_Findings                   gynecological_findings
 ============================================================
 MISSING VALUE ANALYSIS - Integrated Dataset
 ============================================================
-Overall Missing Data : 28,719 cells (30.64% of all data)
+Overall Missing Data : 14,008 cells (29.86% of all data)
 Columns with Missing Values : 58 out of 60
 
-EXPECTED MISSING VALUES
+MISSING VALUES IN DIAGNOSIS_PRESUMPTIVE
 ------------------------------------------------------------
-Diagnosis_Presumptive                 782 (50.06%)
-Reason : Column unavailable in Dataset 2 during integration.
-Action : Retain column. Handle during preprocessing if needed.
+Diagnosis_Presumptive                   2 (0.26%)
+Reason : Missing values are present in the Dataset 1 source data.
+Action : Preserve the observed missing values and handle this column according to the existing preprocessing and leakage-control rules.
 
+
+TARGET VARIABLE CHECK
+------------------------------------------------------------
+Target Column : Diagnosis
+Missing Target Values : 2 (0.26%)
+[WARNING] Missing target values detected.
+These records cannot be used as labeled samples for supervised model training.
 
 COLUMNS REQUIRING PREPROCESSING
 ------------------------------------------------------------
 Column Name                              Missing      Percent      Status            
 ------------------------------------------------------------------------------------------
-Abscess_Location                         1536         98.34      % Critical          
-Gynecological_Findings                   1510         96.67      % Critical          
-Conglomerate_of_Bowel_Loops              1476         94.49      % Critical          
-Segmented_Neutrophils                    1454         93.09      % Critical          
-Ileus                                    1442         92.32      % Critical          
-Perfusion                                1436         91.93      % Critical          
-Enteritis                                1431         91.61      % Critical          
-Appendicolith                            1424         91.17      % Critical          
-Coprostasis                              1420         90.91      % Critical          
-Perforation                              1400         89.63      % Critical          
-Appendicular_Abscess                     1392         89.12      % Critical          
-Bowel_Wall_Thickening                    1364         87.32      % Critical          
-Lymph_Nodes_Location                     1321         84.57      % Critical          
-Target_Sign                              1286         82.33      % Critical          
-Meteorism                                1282         82.07      % Critical          
-Pathological_Lymph_Nodes                 1157         74.07      % Critical          
-Appendix_Wall_Layers                     1126         72.09      % Critical          
-Surrounding_Tissue_Reaction              1059         67.80      % Critical          
-Appendix_Diameter                        567          36.30      % Poor              
-RBC_in_Urine                             410          26.25      % Poor              
-Ketones_in_Urine                         398          25.48      % Poor              
-WBC_in_Urine                             396          25.35      % Poor              
-Ipsilateral_Rebound_Tenderness           325          20.81      % Poor              
-Neutrophil_Percentage                    205          13.12      % Fair              
-Free_Fluids                              125          8.00       % Fair              
-Paedriatic_Appendicitis_Score            103          6.59       % Fair              
-Alvarado_Score                           103          6.59       % Fair              
-Neutrophilia                             99           6.34       % Fair              
-Psoas_Sign                               72           4.61       % Good              
-Dysuria                                  57           3.65       % Good              
-BMI                                      53           3.39       % Good              
-Height                                   51           3.27       % Good              
-RDW                                      51           3.27       % Good              
-US_Number                                43           2.75       % Good              
-Thrombocyte_Count                        35           2.24       % Good              
-Hemoglobin                               35           2.24       % Good              
-RBC_Count                                35           2.24       % Good              
-Stool                                    33           2.11       % Good              
-Coughing_Pain                            31           1.98       % Good              
-Contralateral_Rebound_Tenderness         29           1.86       % Good              
-CRP                                      21           1.34       % Good              
-Loss_of_Appetite                         19           1.22       % Good              
-Migratory_Pain                           17           1.09       % Good              
-Peritonitis                              17           1.09       % Good              
-Nausea                                   15           0.96       % Good              
-Lower_Right_Abd_Pain                     15           0.96       % Good              
-Body_Temperature                         13           0.83       % Good              
-WBC_Count                                11           0.70       % Good              
-Appendix_on_US                           9            0.58       % Good              
-Length_of_Stay                           7            0.45       % Good              
-US_Performed                             7            0.45       % Good              
-Weight                                   5            0.32       % Good              
-Diagnosis                                3            0.19       % Good              
-Sex                                      3            0.19       % Good              
-Severity                                 1            0.06       % Good              
-Management                               1            0.06       % Good              
-Age                                      1            0.06       % Good              
+Abscess_Location                         769          98.34      % Critical          
+Gynecological_Findings                   756          96.68      % Critical          
+Conglomerate_of_Bowel_Loops              739          94.50      % Critical          
+Segmented_Neutrophils                    728          93.09      % Critical          
+Ileus                                    722          92.33      % Critical          
+Perfusion                                719          91.94      % Critical          
+Enteritis                                716          91.56      % Critical          
+Appendicolith                            713          91.18      % Critical          
+Coprostasis                              711          90.92      % Critical          
+Perforation                              701          89.64      % Critical          
+Appendicular_Abscess                     697          89.13      % Critical          
+Bowel_Wall_Thickening                    683          87.34      % Critical          
+Lymph_Nodes_Location                     661          84.53      % Critical          
+Target_Sign                              644          82.35      % Critical          
+Meteorism                                642          82.10      % Critical          
+Pathological_Lymph_Nodes                 579          74.04      % Critical          
+Appendix_Wall_Layers                     564          72.12      % Critical          
+Surrounding_Tissue_Reaction              530          67.77      % Critical          
+Appendix_Diameter                        284          36.32      % Poor              
+RBC_in_Urine                             206          26.34      % Poor              
+Ketones_in_Urine                         200          25.58      % Poor              
+WBC_in_Urine                             199          25.45      % Poor              
+Ipsilateral_Rebound_Tenderness           163          20.84      % Poor              
+Neutrophil_Percentage                    103          13.17      % Fair              
+Free_Fluids                              63           8.06       % Fair              
+Alvarado_Score                           52           6.65       % Fair              
+Paedriatic_Appendicitis_Score            52           6.65       % Fair              
+Neutrophilia                             50           6.39       % Fair              
+Psoas_Sign                               37           4.73       % Good              
+Dysuria                                  29           3.71       % Good              
+BMI                                      27           3.45       % Good              
+Height                                   26           3.32       % Good              
+RDW                                      26           3.32       % Good              
+US_Number                                22           2.81       % Good              
+Thrombocyte_Count                        18           2.30       % Good              
+Hemoglobin                               18           2.30       % Good              
+RBC_Count                                18           2.30       % Good              
+Stool                                    17           2.17       % Good              
+Coughing_Pain                            16           2.05       % Good              
+Contralateral_Rebound_Tenderness         15           1.92       % Good              
+CRP                                      11           1.41       % Good              
+Loss_of_Appetite                         10           1.28       % Good              
+Peritonitis                              9            1.15       % Good              
+Migratory_Pain                           9            1.15       % Good              
+Nausea                                   8            1.02       % Good              
+Lower_Right_Abd_Pain                     8            1.02       % Good              
+Body_Temperature                         7            0.90       % Good              
+WBC_Count                                6            0.77       % Good              
+Appendix_on_US                           5            0.64       % Good              
+Length_of_Stay                           4            0.51       % Good              
+US_Performed                             4            0.51       % Good              
+Weight                                   3            0.38       % Good              
+Sex                                      2            0.26       % Good              
+Severity                                 1            0.13       % Good              
+Management                               1            0.13       % Good              
+Age                                      1            0.13       % Good              
 Source_Dataset                           0            0.00       % Complete          
 Patient_Record_ID                        0            0.00       % Complete          
 
