@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, font
 
 from backend_predictor import AppendicitisPredictor
 from gui.patient_frame import PatientFrame
@@ -18,9 +18,9 @@ class AppendicitisGUI:
         self.configure_theme()
         self.initialize_backend()
         self.initialize_variables()
-        self.create_scrollable_container()
-        self.build_interface()
-        self.bind_events()
+        self.container = tk.Frame(self.root, bg=self.COLOR_BACKGROUND)
+        self.container.pack(fill="both", expand=True)
+        self.show_landing_page()
 
 
     def configure_window(self):
@@ -31,29 +31,31 @@ class AppendicitisGUI:
 
 
     def configure_theme(self):
-        # Modern Flat UI Palette (Clean & Minimalist Dashboard Aesthetic)
-        self.COLOR_BACKGROUND = "#F3F4F6"      # Soft light gray background
-        self.COLOR_PRIMARY = "#2563EB"         # Modern vibrant blue (Tailwind blue-600)
-        self.COLOR_SUCCESS = "#16A34A"         # Modern green
-        self.COLOR_WARNING = "#D97706"         # Modern amber
-        self.COLOR_DANGER = "#DC2626"          # Modern red
-        self.COLOR_WHITE = "#FFFFFF"           # Card surface color
-        self.COLOR_FRAME = "#FFFFFF"           # Clean white card containers
-        self.COLOR_TEXT = "#1F2937"            # Dark slate for high legibility
+        self.COLOR_BACKGROUND = "#F8FAFC"
+        self.COLOR_PRIMARY = "#0284C7"
+        self.COLOR_SUCCESS = "#16A34A"
+        self.COLOR_WARNING = "#D97706"
+        self.COLOR_DANGER = "#DC2626"
+        self.COLOR_WHITE = "#FFFFFF"
+        self.COLOR_FRAME = "#FFFFFF"
+        self.COLOR_TEXT = "#0F172A"
+        self.COLOR_MUTED = "#64748B"
 
-        self.FONT_TITLE = ("Segoe UI", 18, "bold")
-        self.FONT_SECTION = ("Segoe UI", 11, "bold")
-        self.FONT_NORMAL = ("Segoe UI", 10)
-        self.FONT_RESULT = ("Segoe UI", 11, "bold")
-        self.FONT_SMALL = ("Segoe UI", 9)
+        available_fonts = font.families()
+        primary_typeface = "Lexend" if "Lexend" in available_fonts else "Segoe UI"
+
+        self.FONT_TITLE = (primary_typeface, 22, "bold")
+        self.FONT_SUBTITLE = (primary_typeface, 11)
+        self.FONT_SECTION = (primary_typeface, 11, "bold")
+        self.FONT_NORMAL = (primary_typeface, 10)
+        self.FONT_RESULT = (primary_typeface, 11, "bold")
+        self.FONT_SMALL = (primary_typeface, 9)
 
         self.root.configure(bg=self.COLOR_BACKGROUND)
 
-        # Configure Modern TTK Styles (Clam theme base)
+        # Configure Modern TTK Styles
         self.style = ttk.Style()
         self.style.theme_use("clam")
-
-        # Modern Combobox Style
         self.style.configure(
             "TCombobox",
             fieldbackground="white",
@@ -64,25 +66,22 @@ class AppendicitisGUI:
 
 
     def initialize_backend(self):
-        self.backend = AppendicitisPredictor()
+        try:
+            self.backend = AppendicitisPredictor()
+        except Exception as e:
+            messagebox.showerror("Initialization Error", f"Failed to load backend predictor models:\n{e}")
+            self.backend = None
 
-    
+
     def initialize_variables(self):
-
         # =====================================================
-        # PATIENT INFORMATION
+        # PATIENT INFORMATION & VITALS
         # =====================================================
-
         self.age_var = tk.StringVar()
         self.sex_var = tk.StringVar()
         self.weight_var = tk.StringVar()
         self.height_var = tk.StringVar()
         self.bmi_var = tk.StringVar()
-
-        # =====================================================
-        # VITAL SIGNS
-        # =====================================================
-
         self.body_temperature_var = tk.StringVar()
 
         # =====================================================
@@ -103,7 +102,6 @@ class AppendicitisGUI:
         # =====================================================
         # LABORATORY VARIABLES
         # =====================================================
-
         self.appendix_diameter_var = tk.StringVar()
         self.wbc_count_var = tk.StringVar()
         self.crp_var = tk.StringVar()
@@ -121,7 +119,6 @@ class AppendicitisGUI:
         # =====================================================
         # ULTRASOUND VARIABLES
         # =====================================================
-
         self.appendix_on_us_var = tk.StringVar()
         self.free_fluids_var = tk.StringVar()
         self.appendix_wall_layers_var = tk.StringVar()
@@ -134,7 +131,6 @@ class AppendicitisGUI:
         # =====================================================
         # ULTRASOUND COMPLICATIONS
         # =====================================================
-
         self.appendicular_abscess_var = tk.StringVar()
         self.abscess_location_var = tk.StringVar()
         self.pathological_lymph_nodes_var = tk.StringVar()
@@ -146,10 +142,105 @@ class AppendicitisGUI:
         self.meteorism_var = tk.StringVar()
         self.enteritis_var = tk.StringVar()
 
-    
+
+    def clear_container(self):
+        for widget in self.container.winfo_children():
+            widget.destroy()
+
+
+    def show_landing_page(self):
+        self.clear_container()
+
+        landing_wrapper = tk.Frame(self.container, bg=self.COLOR_BACKGROUND)
+        landing_wrapper.pack(fill="both", expand=True, padx=40, pady=40)
+
+        card = tk.Frame(landing_wrapper, bg=self.COLOR_WHITE, highlightbackground="#E2E8F0", highlightthickness=1)
+        card.place(relx=0.5, rely=0.5, anchor="center", width=900, height=560)
+
+        header_frame = tk.Frame(card, bg=self.COLOR_WHITE)
+        header_frame.pack(fill="x", padx=60, pady=(50, 15))
+
+        tk.Label(
+            header_frame, 
+            text="🩺 Pediatric Appendicitis AI Predictor", 
+            font=self.FONT_TITLE, 
+            bg=self.COLOR_WHITE, 
+            fg=self.COLOR_TEXT
+        ).pack(anchor="w")
+
+        tk.Label(
+            header_frame, 
+            text="An advanced multi-model clinical decision support platform combining deep Transformer architectures with high-performance ensemble machine learning.", 
+            font=self.FONT_SUBTITLE, 
+            bg=self.COLOR_WHITE, 
+            fg=self.COLOR_MUTED,
+            wraplength=760,
+            justify="left"
+        ).pack(anchor="w", pady=(8, 0))
+
+        ttk.Separator(card, orient="horizontal").pack(fill="x", padx=60, pady=15)
+
+        features_frame = tk.Frame(card, bg=self.COLOR_WHITE)
+        features_frame.pack(fill="both", padx=60, pady=10)
+
+        features = [
+            "**Ensemble Consensus:** Simultaneously queries Decision Tree, Gradient Boosting, XGBoost, and Transformer models.",
+            "**Resilient Missing-Data Handling:** Seamlessly analyzes incomplete lab panels or ultrasound scans using intelligent imputation.",
+            "**Pediatric-Optimized Precision:** Tuned sensitivity and probability thresholds specifically designed for acute abdominal triage."
+        ]
+
+        for feat in features:
+            tk.Label(
+                features_frame, 
+                text=feat.replace("**", ""), 
+                font=self.FONT_NORMAL, 
+                bg=self.COLOR_WHITE, 
+                fg=self.COLOR_TEXT,
+                anchor="w"
+            ).pack(anchor="w", pady=6)
+
+        action_frame = tk.Frame(card, bg=self.COLOR_WHITE)
+        action_frame.pack(fill="x", padx=60, pady=(35, 40))
+
+        start_btn = tk.Button(
+            action_frame,
+            text="Launch Clinical Dashboard  →",
+            command=self.show_main_app,
+            bg=self.COLOR_PRIMARY,
+            fg="white",
+            font=self.FONT_RESULT,
+            relief="flat",
+            padx=28,
+            pady=12,
+            cursor="hand2"
+        )
+        start_btn.pack(side="left")
+
+        exit_btn = tk.Button(
+            action_frame,
+            text="Exit Application",
+            command=self.root.destroy,
+            bg="#F1F5F9",
+            fg=self.COLOR_MUTED,
+            font=self.FONT_NORMAL,
+            relief="flat",
+            padx=20,
+            pady=12,
+            cursor="hand2"
+        )
+        exit_btn.pack(side="right")
+
+
+    def show_main_app(self):
+        self.clear_container()
+        self.create_scrollable_container()
+        self.build_interface()
+        self.bind_events()
+
+
     def create_scrollable_container(self):
-        self.canvas = tk.Canvas(self.root, bg=self.COLOR_BACKGROUND, highlightthickness=0)
-        self.v_scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=self.canvas.yview)
+        self.canvas = tk.Canvas(self.container, bg=self.COLOR_BACKGROUND, highlightthickness=0)
+        self.v_scrollbar = ttk.Scrollbar(self.container, orient="vertical", command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.v_scrollbar.set)
         self.v_scrollbar.pack(side="right", fill="y")
         self.canvas.pack(side="left", fill="both", expand=True)
@@ -185,7 +276,7 @@ class AppendicitisGUI:
 
 
     def build_interface(self):
-        self.create_title()
+        self.create_top_navigation()   
         self.patient_frame = PatientFrame(parent=self.main_frame, app=self)
         self.patient_frame.build()
         self.vital_frame = VitalFrame(parent=self.main_frame, app=self)
@@ -203,45 +294,61 @@ class AppendicitisGUI:
         self.create_buttons()
 
 
-    def create_title(self):
-        self.title_label = tk.Label(
-            self.main_frame,
-            text="Pediatric Appendicitis Diagnosis Prediction System",
-            font=self.FONT_TITLE,
-            bg=self.COLOR_BACKGROUND,
-            fg=self.COLOR_PRIMARY
-        )
-        self.title_label.pack(pady=(15, 15))
+    def create_top_navigation(self):
+        nav_frame = tk.Frame(self.main_frame, bg=self.COLOR_WHITE, highlightbackground="#E2E8F0", highlightthickness=1)
+        nav_frame.pack(fill="x", padx=15, pady=(15, 10))
 
-    
+        tk.Label(
+            nav_frame,
+            text="🩺 Pediatric Appendicitis Diagnostic Dashboard",
+            font=(self.FONT_SECTION[0], 13, "bold"),
+            bg=self.COLOR_WHITE,
+            fg=self.COLOR_TEXT
+        ).pack(side="left", padx=20, pady=15)
+
+        back_btn = tk.Button(
+            nav_frame,
+            text="← Return to Landing",
+            command=self.show_landing_page,
+            bg="#F1F5F9",
+            fg=self.COLOR_MUTED,
+            font=self.FONT_SMALL,
+            relief="flat",
+            padx=12,
+            pady=8,
+            cursor="hand2"
+        )
+        back_btn.pack(side="right", padx=20, pady=15)
+
+
     def create_buttons(self):
         self.button_frame = tk.Frame(self.main_frame, bg=self.COLOR_BACKGROUND)
-        self.button_frame.pack(fill="x", pady=20, padx=15)
+        self.button_frame.pack(fill="x", pady=25, padx=15)
         
         self.predict_button = tk.Button(
             self.button_frame,
-            text="Predict Diagnosis",
+            text="Run Diagnostic Prediction",
             command=self.predict,
             bg=self.COLOR_SUCCESS,
             fg="white",
-            font=("Segoe UI", 10, "bold"),
+            font=self.FONT_RESULT,
             relief="flat",
-            padx=20,
-            pady=10,
+            padx=25,
+            pady=12,
             cursor="hand2"
         )
         self.predict_button.pack(side="left", padx=5)
 
         self.clear_button = tk.Button(
             self.button_frame,
-            text="Clear Fields",
+            text="Clear All Fields",
             command=self.clear_fields,
             bg=self.COLOR_WARNING,
             fg="white",
-            font=("Segoe UI", 10, "bold"),
+            font=self.FONT_NORMAL,
             relief="flat",
             padx=20,
-            pady=10,
+            pady=12,
             cursor="hand2"
         )
         self.clear_button.pack(side="left", padx=5)
@@ -252,10 +359,10 @@ class AppendicitisGUI:
             command=self.root.destroy,
             bg=self.COLOR_DANGER,
             fg="white",
-            font=("Segoe UI", 10, "bold"),
+            font=self.FONT_NORMAL,
             relief="flat",
             padx=20,
-            pady=10,
+            pady=12,
             cursor="hand2"
         )
         self.exit_button.pack(side="right", padx=5)
@@ -341,6 +448,9 @@ class AppendicitisGUI:
 
 
     def predict(self):
+        if not self.backend:
+            messagebox.showerror("Error", "Backend predictor is not initialized.")
+            return
         try:
             patient = self.collect_inputs()
             result = self.backend.predict_all(patient)
