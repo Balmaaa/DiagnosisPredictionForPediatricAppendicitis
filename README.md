@@ -38,12 +38,12 @@ This repository provides an AI-based clinical decision support system for diagno
 - **Laboratory Metrics**: WBC Count, RBC Count, Hemoglobin, RDW, Segmented Neutrophils, Thrombocyte Count, CRP, Neutrophil Percentage, plus 8 missing indicator flags.
 
 ## Model Performance & Validation Metrics
-| Model | Accuracy | Sensitivity | Specificity | PPV | NPV | F1 Score |
-|-------|----------|-------------|-------------|-----|-----|----------|
-| **Decision Tree** | 89.74% | 92.23% | 87.63% | 88.79% | 89.12% | 0.9048 |
-| **Gradient Boosting** | 92.31% | 95.15% | 92.78% | 93.33% | 94.74% | 0.9423 |
-| **XGBoost** | 94.23% | 96.12% | 94.85% | 95.19% | 95.83% | 0.9565 |
-| **Transformer** | 96.15% | 97.09% | 96.91% | 97.09% | 96.91% | 0.9709 |
+| Model | Accuracy | Precision | Sensitivity (Recall) | Specificity | PPV | NPV |
+|-------|----------|-----------|----------------------|-------------|-----|-----|
+| **Decision Tree** | 81.41% | 85.56% | 82.80% | 79.37% | 85.56% | 75.76% |
+| **Gradient Boosting** | 89.74% | 90.53% | 92.47% | 85.71% | 90.53% | 88.52% |
+| **XGBoost** | 88.46% | 88.66% | 92.47% | 82.54% | 88.66% | 88.14% |
+| **Transformer** | 89.10% | 89.58% | 92.47% | 84.13% | 89.58% | 88.33% |
 
 ## Installation & Setup
 
