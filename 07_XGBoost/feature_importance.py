@@ -1,146 +1,136 @@
 import pickle
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 from pathlib import Path
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.inspection import permutation_importance
+
+SEED = 42
+np.random.seed(SEED)
 
 
-# ============================================================
-# LOAD XGBOOST MODEL
-# ============================================================
+class XGBoostFeatureImportanceAnalyzer:
+    def __init__(self):
+        self.preprocess_dir = Path(__file__).resolve().parents[1] / "03_Preprocessing Pipeline"
+        self.gui_dir = Path(__file__).resolve().parents[1] / "09_GUI Application" / "saved_models"
+        self.model = None
+        self.feature_names = None
+        self.X_test = None
+        self.y_test = None
 
-def load_xgboost_model():
-    model_path = (Path(__file__).resolve().parents[1] / "09_GUI Application" / "saved_models" / "XGBoost.pkl")
+    def load_data_and_model(self):
+        pipeline_files = sorted(self.preprocess_dir.glob("preprocessing_pipeline_*.pkl"))
+        if not pipeline_files:
+            raise FileNotFoundError("No preprocessing pipeline found.")
+        
+        with open(pipeline_files[-1], "rb") as f:
+            pipeline = pickle.load(f)
+        self.feature_names = pipeline["feature_names"]
 
-    if not model_path.exists():
-        raise FileNotFoundError(f"Model not found:\n{model_path}")
+        self.X_test = pd.read_csv(self.preprocess_dir / "X_test.csv")
+        self.y_test = pd.read_csv(self.preprocess_dir / "y_test.csv").values.ravel()
 
-    print(f"Loading model:\n{model_path.name}")
+        model_path = self.gui_dir / "XGBoost.pkl"
+        if not model_path.exists():
+            raise FileNotFoundError(f"XGBoost model not found at {model_path}. Please run training first.")
+            
+        with open(model_path, "rb") as f:
+            model_data = pickle.load(f)
+            
+        self.model = model_data["model"]
+        print("XGBoost model and test datasets loaded successfully.")
 
-    with open(model_path, "rb") as f:
-        model_data = pickle.load(f)
+    def compute_permutation_importance(self, n_repeats=10):
+        print("\nComputing Permutation Feature Importance for XGBoost (Recall Drop)...")
+        result = permutation_importance(
+            estimator=self.model,
+            X=self.X_test,
+            y=self.y_test,
+            scoring="recall",
+            n_repeats=n_repeats,
+            random_state=SEED,
+            n_jobs=-1
+        )
 
-    model = model_data["model"]
-    feature_names = model_data["feature_names"]
-    return model, feature_names
+        df = pd.DataFrame({
+            "Feature": self.feature_names,
+            "Importance": result.importances_mean,
+            "Std": result.importances_std
+        })
+        
+        df = df.groupby("Feature", as_index=False).agg({"Importance": "max", "Std": "mean"})
+        df = df.sort_values(by="Importance", ascending=False).reset_index(drop=True)
+        return df
 
+    def plot_and_save(self, df, top_n=15):
+        plt.close('all')
+        fig, ax = plt.subplots(figsize=(10, 8))
+        ax.clear()
+        
+        top_df = df.head(top_n).iloc[::-1]
 
-# ============================================================
-# LOAD PIPELINE (OPTIONAL CHECK)
-# ============================================================
+        bars = ax.barh(
+            top_df["Feature"], 
+            top_df["Importance"], 
+            xerr=top_df["Std"], 
+            color="skyblue", 
+            edgecolor="steelblue",
+            linewidth=1.2,
+            alpha=0.9, 
+            capsize=4
+        )
 
-def load_pipeline():
-    preprocess_dir = (Path(__file__).resolve().parents[1] / "03_Preprocessing Pipeline")
-    pipeline_files = sorted(preprocess_dir.glob("preprocessing_pipeline_*.pkl"))
+        ax.set_xlabel("Mean Recall Drop (Permutation Importance)", fontsize=11, fontweight="bold")
+        ax.set_ylabel("Clinical Feature", fontsize=11, fontweight="bold")
+        ax.set_title("XGBoost Model - Feature Importance", fontsize=14, fontweight="bold", pad=15)
 
-    if len(pipeline_files) == 0:
-        raise FileNotFoundError("No preprocessing pipeline found.")
+        max_val = top_df["Importance"].max()
+        if max_val == 0:
+            max_val = 0.01
+            
+        ax.set_xlim(0, max_val * 1.30)
+        ax.grid(axis="x", linestyle="--", alpha=0.5)
 
-    pipeline_path = pipeline_files[-1]
-    print(f"Loading pipeline:\n{pipeline_path.name}")
-
-    with open(pipeline_path, "rb") as f:
-        pipeline = pickle.load(f)
-
-    return pipeline
-
-
-# ============================================================
-# FEATURE IMPORTANCE
-# ============================================================
-
-def get_feature_importance(model, feature_names):
-    importance = model.feature_importances_
-    importance_df = pd.DataFrame({"Feature": feature_names, "Importance": importance})
-    importance_df = (importance_df.sort_values(by="Importance", ascending=False).reset_index(drop=True))
-    return importance_df
-
-
-# ============================================================
-# HORIZONTAL BAR GRAPH
-# ============================================================
-
-def plot_feature_importance(importance_df, top_n=20):
-    plot_df = (importance_df.head(top_n).sort_values(by="Importance", ascending=True))
-    plt.figure(figsize=(11, 8))
-    bars = plt.barh(plot_df["Feature"], plot_df["Importance"])
-    plt.title(f"Top {top_n} XGBoost Feature Importance", fontsize=14, fontweight="bold")
-    plt.xlabel("Importance")
-    plt.ylabel("Feature")
-    plt.grid(axis="x", alpha=0.30)
-
-    for bar in bars:
-        width = bar.get_width()
-        plt.text(width + 0.002, bar.get_y() + bar.get_height() / 2, f"{width:.3f}", va="center", fontsize=9)
-
-    plt.tight_layout()
-    output_path = (Path(__file__).resolve().parent / "xgboost_feature_importance.png")
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.close()
-    print(f"Saved figure to\n{output_path}")
-
-
-# ============================================================
-# PRINT FEATURE RANKING
-# ============================================================
-
-def print_feature_ranking(importance_df, top_n=20):
-    print("\n" + "=" * 70)
-    print("XGBOOST FEATURE IMPORTANCE")
-    print("=" * 70)
-
-    top_features = importance_df.head(top_n)
-
-    print(top_features.to_string(index=False))
-    print("=" * 70)
-
-    csv_path = (Path(__file__).resolve().parent / "xgboost_feature_importance.csv")
-    top_features.to_csv(csv_path, index=False)
-    print(f"\nSaved CSV to\n{csv_path}")
-
-
-# ============================================================
-# MAIN
-# ============================================================
-
-def main():
-    print("=" * 70)
-    print("XGBOOST FEATURE IMPORTANCE")
-    print("=" * 70)
-
-    try:
-        pipeline = load_pipeline()
-        print(f"\nPipeline Features : {len(pipeline['feature_names'])}")
-        model, feature_names = load_xgboost_model()
-        print(f"Loaded Model : {type(model).__name__}")
-        print(f"Loaded Features : {len(feature_names)}")
-
-        if len(feature_names) != len(model.feature_importances_):
-            raise ValueError(
-                f"""
-                Feature count mismatch!
-                Model Importance Length : {len(model.feature_importances_)}
-                Feature Name Length     : {len(feature_names)}
-                """
+        for bar, row in zip(bars, top_df.itertuples()):
+            text_val = f"{row.Importance:.4f}"
+            y_center = bar.get_y() + bar.get_height() / 2
+            ax.text(
+                row.Importance + (max_val * 0.02), 
+                y_center, 
+                text_val, 
+                va="center", 
+                ha="left", 
+                fontsize=9, 
+                fontweight="semibold",
+                color="black"
             )
 
-        importance_df = get_feature_importance(model, feature_names)
-        print_feature_ranking(importance_df, top_n=20)
-        plot_feature_importance(importance_df, top_n=20)
-        print("\nAnalysis Completed Successfully.")
+        fig.tight_layout()
 
-    except Exception as e:
-        print("\nERROR")
-        print("-" * 70)
-        print(e)
+        script_dir = Path(__file__).parent
+        img_path = script_dir / "xgboost_feature_importance.png"
+        csv_path = script_dir / "xgboost_feature_importance.csv"
 
-        import traceback
-        traceback.print_exc()
+        if img_path.exists():
+            img_path.unlink()
+
+        fig.savefig(img_path, dpi=300, bbox_inches="tight")
+        df.to_csv(csv_path, index=False)
+
+        print("\n" + "=" * 60)
+        print(f"Figure successfully saved to: {img_path}")
+        print(f"CSV data successfully saved to: {csv_path}")
+        print("=" * 60)
+
+        plt.close(fig)
 
 
-# ============================================================
-# ENTRY
-# ============================================================
+def main():
+    analyzer = XGBoostFeatureImportanceAnalyzer()
+    analyzer.load_data_and_model()
+    importance_df = analyzer.compute_permutation_importance(n_repeats=10)
+    analyzer.plot_and_save(importance_df, top_n=15)
+
 
 if __name__ == "__main__":
     main()
