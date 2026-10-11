@@ -50,6 +50,24 @@ TEST_CASES = [
             "Stool": "normal", "Peritonitis": "No", "Psoas_Sign": "No", "Ipsilateral_Rebound_Tenderness": "No",
             "Appendix_on_US": "No"
         }
+    },
+    {
+        "name": "5. Comprehensive Test with Ultrasound Complications",
+        "data": {
+            "Age": 11, "Sex": "male", "Weight": 38, "Height": 142, "BMI": 18.8,
+            "Body_Temperature": 38.5,
+            "Migratory_Pain": "Yes", "Lower_Right_Abd_Pain": "Yes", "Contralateral_Rebound_Tenderness": "Yes",
+            "Coughing_Pain": "Yes", "Nausea": "Yes", "Loss_of_Appetite": "Yes", "Dysuria": "No",
+            "Stool": "normal", "Peritonitis": "local", "Psoas_Sign": "Yes", "Ipsilateral_Rebound_Tenderness": "Yes",
+            "Appendix_Diameter": 9.2, "WBC_Count": 15.1, "CRP": 30.5, "Neutrophil_Percentage": 88.0,
+            "Segmented_Neutrophils": 81.0, "Neutrophilia": "Yes", "RBC_Count": 4.2, "Hemoglobin": 12.5,
+            "RDW": 14.0, "Thrombocyte_Count": 330, "Ketones_in_Urine": "++", "RBC_in_Urine": "No", "WBC_in_Urine": "+",
+            "Appendix_on_US": "Yes", "Free_Fluids": "Yes", "Target_Sign": "Yes",
+            "Appendicular_Abscess": "Yes", "Pathological_Lymph_Nodes": "Yes", 
+            "Bowel_Wall_Thickening": "Yes", "Ileus": "No", "Meteorism": "No",
+            "Abscess_Location": "local", "Lymph_Node_Location": "right lower quadrant",
+            "Conglomerate_of_Bowel_Loops": "No", "Coprostasis": "No", "Enteritis": "No"
+        }
     }
 ]
 
