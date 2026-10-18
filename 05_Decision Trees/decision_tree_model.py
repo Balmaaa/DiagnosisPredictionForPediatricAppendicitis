@@ -56,10 +56,9 @@ class DecisionTreeModel:
 
         self.model = DecisionTreeClassifier(
             criterion="gini",
-            max_depth=5,
+            max_depth=6,
             min_samples_split=10,
             min_samples_leaf=5,
-            max_features="sqrt",
             class_weight="balanced",
             random_state=SEED
         )
@@ -111,7 +110,7 @@ class DecisionTreeModel:
 
     def save_model(self):
         model_data = {"model": self.model, "feature_names": self.feature_names, "model_type": "decision_tree", "threshold": 0.5}
-        save_path = Path(__file__).resolve().parents[1] / "09_GUI Application" / "saved_models" / "DecisionTree.pkl"
+        save_path = Path(__file__).resolve().parents[1] / "08_GUI Application" / "saved_models" / "DecisionTree.pkl"
         save_path.parent.mkdir(parents=True, exist_ok=True)
         with open(save_path, "wb") as f:
             pickle.dump(model_data, f)

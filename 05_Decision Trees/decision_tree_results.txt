@@ -6,16 +6,16 @@ Loading pipeline: preprocessing_pipeline_20261011_030007.pkl
 
 Training Decision Tree...
 Training completed.
-Tree depth: 5
+Tree depth: 6
 Number of leaves: 19
 
 ======================================================================
 RESULTS
 ======================================================================
-Accuracy     : 0.8141
-Precision    : 0.8556
-Recall       : 0.8280
-Specificity  : 0.7937
-PPV          : 0.8556
-NPV          : 0.7576
+Accuracy     : 0.8782
+Precision    : 0.9405
+Recall       : 0.8495
+Specificity  : 0.9206
+PPV          : 0.9405
+NPV          : 0.8056
 Model saved for GUI: C:\Users\balma\Desktop\UP\Diagnosis Prediction Model for Pediatric Appendicitis using Artificial Intelligence Transformer Model\09_GUI Application\saved_models\DecisionTree.pkl

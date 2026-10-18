@@ -87,7 +87,7 @@ def run_automated_tests():
             print(f"  -> Highest Confidence  : {result['highest_model']} ({result['highest_probability']:.2%})")
             print(f"  -> Lab Status          : {'Complete' if result['laboratory_available'] else 'Missing Values'}")
             if not result['laboratory_available']:
-                print(f"     Missing Fields      : {result['missing_laboratory_fields']}")
+                print(f"      Missing Fields     : {result['missing_laboratory_fields']}")
             
             print("  -> Individual Model Breakdown:")
             for model_name, m_res in result["models"].items():

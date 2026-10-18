@@ -12,7 +12,7 @@ np.random.seed(SEED)
 class DecisionTreeFeatureImportanceAnalyzer:
     def __init__(self):
         self.preprocess_dir = Path(__file__).resolve().parents[1] / "03_Preprocessing Pipeline"
-        self.gui_dir = Path(__file__).resolve().parents[1] / "09_GUI Application" / "saved_models"
+        self.gui_dir = Path(__file__).resolve().parents[1] / "08_GUI Application" / "saved_models"
         self.model = None
         self.feature_names = None
         self.X_test = None
