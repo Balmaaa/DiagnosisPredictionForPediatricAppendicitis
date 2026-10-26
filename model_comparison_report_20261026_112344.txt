@@ -1,0 +1,50 @@
+====================================================================================================
+COMPREHENSIVE MODEL COMPARISON REPORT
+Pediatric Appendicitis Prediction System (Regensburg Cohort)
+====================================================================================================
+Generated on: 2026-10-26 11:23:48
+
+EXECUTIVE SUMMARY:
+--------------------------------------------------
+Best Overall Model: Transformer
+Best Accuracy: 0.9700
+
+MODEL METRICS BREAKDOWN:
+--------------------------------------------------
+Decision Tree:
+  Accuracy: 0.9000
+  Precision: 0.8879
+  Sensitivity: 0.9223
+  Specificity: 0.8763
+  F1 Score: 0.9048
+  PPV: 0.8879
+  NPV: 0.9140
+
+Gradient Boosting:
+  Accuracy: 0.9400
+  Precision: 0.9333
+  Sensitivity: 0.9515
+  Specificity: 0.9278
+  F1 Score: 0.9423
+  PPV: 0.9333
+  NPV: 0.9474
+
+XGBoost:
+  Accuracy: 0.9550
+  Precision: 0.9519
+  Sensitivity: 0.9612
+  Specificity: 0.9485
+  F1 Score: 0.9565
+  PPV: 0.9519
+  NPV: 0.9583
+
+Transformer:
+  Accuracy: 0.9700
+  Precision: 0.9709
+  Sensitivity: 0.9709
+  Specificity: 0.9691
+  F1 Score: 0.9709
+  PPV: 0.9709
+  NPV: 0.9691
+
+====================================================================================================
